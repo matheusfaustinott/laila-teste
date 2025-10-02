@@ -1,129 +1,41 @@
-# 🏦 Sistema de Controle Financeiro Pessoal
+# Controle Financeiro Pessoal
 
 Sistema completo de gestão financeira pessoal construído com **Node.js**, **React** e **PostgreSQL**.
 
-## 🚀 Execução Rápida (Teste Técnico)
+## (Teste Técnico)
 
-**Requisito único**: Docker e Docker Compose instalados
+**Requisito único**: Docker e Docker Compose instalados apenas.
 
 ```bash
 # Clone o repositório
-git clone <seu-repositorio>
+git clone
 cd laila-teste
 
-# Execute tudo com um comando (versão estável)
+# Execute
 docker-compose up -d
 
-# OU se quiser ver os logs em tempo real
+#logs em tempo real
 docker-compose up
 
-# Para rebuild completo (se necessário)
+# Para rebuild
 docker-compose down -v && docker-compose up --build
 ```
 
-> **💡 Nota**: Se encontrar erro com `docker-compose up --build`, use primeiro `docker-compose build` e depois `docker-compose up -d` para uma execução mais estável.
+> **Aviso importante**: Se encontrar erro com `docker-compose up --build`, use primeiro `docker-compose build` e depois `docker-compose up -d` para uma execução mais estável.
 
-**Pronto!** O sistema estará rodando em poucos minutos:
-
-- **🌐 Frontend**: http://localhost:3000
-- **⚙️ Backend**: http://localhost:3001
-- **📚 Documentação**: http://localhost:3001/api/info
-
-### 🧪 Teste Rápido da API
-
-```bash
-# Criar usuário
-curl -X POST http://localhost:3001/api/auth/registrar \
-  -H "Content-Type: application/json" \
-  -d '{"nomeCompleto":"Teste User","email":"teste@exemplo.com","senha":"senha123"}'
-
-# Login
-curl -X POST http://localhost:3001/api/auth/login \
-  -H "Content-Type: application/json" \
-  -d '{"email":"teste@exemplo.com","senha":"senha123"}'
-```
-
-## ✅ Funcionalidades Implementadas
-
-### 1. **Autenticação JWT**
-
-- ✅ Cadastro com nome, email e senha
-- ✅ Login com autenticação JWT
-- ✅ Middleware de proteção das rotas
-
-### 2. **Lançamentos Financeiros**
-
-- ✅ CRUD completo (criar, listar, editar, excluir)
-- ✅ Campos: título, valor, tipo (receita/despesa), categoria, data
-- ✅ Relacionamento usuário → lançamentos
-- ✅ Filtros e paginação
-
-### 3. **Categorias**
-
-- ✅ CRUD de categorias personalizadas por usuário
-- ✅ Categorias padrão + criação de novas
-- ✅ Relacionamento categoria → lançamentos
-
-### 4. **Resumo Mensal**
-
-- ✅ Total de receitas
-- ✅ Total de despesas
-- ✅ Saldo (receitas - despesas)
-- ✅ Filtro por mês/ano
-
-### 5. **Frontend React**
-
-- ✅ Tela de login/cadastro
-- ✅ Dashboard com lançamentos
-- ✅ Formulários para CRUD
-- ✅ Visualização do resumo mensal
-- ✅ Interface para gerenciar categorias
-
-### 6. **Banco PostgreSQL**
-
-- ✅ TypeORM com migrations automáticas
-- ✅ Relacionamentos: usuário → lançamentos → categorias
-- ✅ Schema gerado automaticamente
-
-## 🏗️ Arquitetura
-
-### Backend (Node.js + TypeScript)
-
-```
-backend/
-├── src/
-│   ├── controladores/    # Controllers da API
-│   ├── modelos/         # Entidades TypeORM
-│   ├── rotas/          # Rotas REST
-│   ├── middlewares/    # JWT, CORS, validação
-│   ├── servicos/       # Lógica de negócio
-│   ├── database/       # Configuração e migrations
-│   └── utils/          # Utilitários
-└── Dockerfile
-```
-
-### Frontend (React + Material-UI)
-
-```
-frontend/
-├── src/
-│   ├── componentes/    # Componentes React
-│   ├── paginas/       # Páginas principais
-│   ├── servicos/      # API client (Axios)
-│   ├── estado/        # Estado global (Signals)
-│   └── config/        # Configurações
-└── Dockerfile
-```
+- **Frontend**: http://localhost:3000
+- **Backend**: http://localhost:3001
+- **Documentação**: http://localhost:3001/api/info
 
 ### Docker
 
 ```
-├── docker-compose.yml  # Orquestração completa
-├── backend/Dockerfile  # Build multi-stage
-└── frontend/Dockerfile # Build + Nginx
+├── docker-compose.yml
+├── backend/Dockerfile
+└── frontend/Dockerfile
 ```
 
-## 🔧 Tecnologias
+## Stack
 
 **Backend:**
 
@@ -135,10 +47,10 @@ frontend/
 
 **Frontend:**
 
-- React 18 + Hooks
+- React 18
 - Material-UI v5
-- @preact/signals (estado)
-- Axios (API client)
+- @preact/signals
+- Axios
 
 **DevOps:**
 
@@ -147,18 +59,7 @@ frontend/
 - Nginx para servir o React
 - Healthchecks automáticos
 
-## 📊 Extras Implementados
-
-- ✅ **Filtros por data e categoria**
-- ✅ **Paginação nos lançamentos**
-- ✅ **Validação completa (backend + frontend)**
-- ✅ **Interface responsiva**
-- ✅ **Estado reativo (Signals)**
-- ✅ **Organização modular do código**
-- ✅ **Migrations automáticas**
-- ✅ **Schema auto-gerado**
-
-## 🛑 Comandos Úteis
+## Comandos Úteis
 
 ```bash
 # Ver status dos containers
@@ -174,10 +75,10 @@ docker-compose logs frontend
 # Parar tudo
 docker-compose down
 
-# Reset completo (apaga dados)
+# Reset completo
 docker-compose down -v && docker-compose up --build
 
-# Rebuild específico (se houver problemas)
+# Rebuild específico
 docker-compose build backend
 docker-compose build frontend
 docker-compose up -d
@@ -187,9 +88,10 @@ curl http://localhost:3001/api/health
 curl http://localhost:3000
 ```
 
-## 🔧 Troubleshooting
+## Troubleshooting
 
-**Problema**: Erro `'ContainerConfig'` no docker-compose up --build
+**Problema**: Erro `'ContainerConfig'` no docker-compose up --build -> isso se da pela versão do docker-compose
+
 **Solução**:
 
 ```bash
@@ -202,14 +104,11 @@ docker-compose up -d
 **Solução**:
 
 ```bash
-docker-compose ps  # ver status
-docker-compose logs <nome-servico>  # ver logs específicos
+docker-compose ps
+docker-compose logs <nome-servico>
 ```
 
-**Problema**: Frontend não carrega
-**Solução**: Verificar se todas as portas estão livres (3000, 3001, 5432)
-
-## 📝 Endpoints da API
+## Endpoints
 
 ### Autenticação
 
@@ -218,7 +117,7 @@ docker-compose logs <nome-servico>  # ver logs específicos
 
 ### Lançamentos
 
-- `GET /api/transacoes` - Listar (paginado + filtros)
+- `GET /api/transacoes` - Listar
 - `POST /api/transacoes` - Criar
 - `PUT /api/transacoes/:id` - Atualizar
 - `DELETE /api/transacoes/:id` - Excluir
@@ -231,125 +130,7 @@ docker-compose logs <nome-servico>  # ver logs específicos
 - `PUT /api/categorias/:id` - Atualizar
 - `DELETE /api/categorias/:id` - Excluir
 
----
-
-**Desenvolvido por**: Matheus Faustino
-**Teste Técnico**: Gerenciador de Finanças Pessoais
-**Stack**: Node.js, React, PostgreSQL, Docker
-
-## 🔗 URLs
-
-- **Frontend**: http://localhost:3000
-- **Backend API**: http://localhost:3001
-- **Documentação**: http://localhost:3001/api/info
-- **Health Check**: http://localhost:3001/api/health
-
-## 🏗️ Arquitetura
-
-### Backend (Node.js + TypeScript)
-
-```
-backend/
-├── src/
-│   ├── controladores/     # Controllers (auth, transações, categorias)
-│   ├── modelos/          # Entidades TypeORM (Usuario, Transacao, Categoria)
-│   ├── rotas/           # Rotas da API REST
-│   ├── middlewares/     # Autenticação JWT, CORS, validação
-│   ├── servicos/        # Lógica de negócio
-│   ├── database/        # Configuração DB e migrations
-│   └── utils/           # Utilitários e helpers
-├── docker-compose.yml   # PostgreSQL containerizado
-└── package.json
-```
-
-### Frontend (React + Material-UI)
-
-```
-frontend/
-├── src/
-│   ├── componentes/     # Componentes React reutilizáveis
-│   ├── paginas/        # Páginas principais (Login, Dashboard)
-│   ├── servicos/       # Integração com API (Axios)
-│   ├── estado/         # Gerenciamento de estado (@preact/signals)
-│   ├── config/         # Configurações e constantes
-│   └── strings/        # Textos centralizados (i18n ready)
-└── package.json
-```
-
-## 📊 Funcionalidades
-
-### ✅ Implementadas
-
-- [x] **Autenticação JWT** (login/registro)
-- [x] **CRUD Transações** (receitas/despesas)
-- [x] **CRUD Categorias** (opcional por transação)
-- [x] **Resumo Mensal** (estatísticas e gráficos)
-- [x] **Filtros e Paginação**
-- [x] **Interface Responsiva** (Material-UI)
-- [x] **Validação Completa** (backend + frontend)
-- [x] **Banco Relacional** (PostgreSQL + TypeORM)
-
-### 🔧 Tecnologias
-
-**Backend:**
-
-- Node.js + TypeScript
-- Express.js + CORS
-- TypeORM + PostgreSQL
-- JWT Authentication
-- Bcrypt para senhas
-- Validação com express-validator
-
-**Frontend:**
-
-- React 18 + Hooks
-- Material-UI v5
-- @preact/signals (estado reativo)
-- Axios (requisições)
-- React Hook Form
-
-**DevOps:**
-
-- Docker Compose
-- Scripts automatizados
-- Logs estruturados
-- Health checks
-
-## 🧪 Testes de API
-
-O script `test-api.sh` executa automaticamente:
-
-1. ✅ Registro de usuário
-2. ✅ Login e obtenção de token JWT
-3. ✅ Criação de categoria
-4. ✅ Criação de transação com categoria
-5. ✅ Criação de transação sem categoria
-6. ✅ Listagem paginada
-7. ✅ Resumo mensal com estatísticas
-
-## 📝 Endpoints da API
-
-### Autenticação
-
-- `POST /api/auth/registrar` - Criar usuário
-- `POST /api/auth/login` - Login
-
-### Transações
-
-- `GET /api/transacoes` - Listar (paginado + filtros)
-- `POST /api/transacoes` - Criar
-- `PUT /api/transacoes/:id` - Atualizar
-- `DELETE /api/transacoes/:id` - Excluir
-- `GET /api/transacoes/resumo/mensal` - Estatísticas
-
-### Categorias
-
-- `GET /api/categorias` - Listar
-- `POST /api/categorias` - Criar
-- `PUT /api/categorias/:id` - Atualizar
-- `DELETE /api/categorias/:id` - Excluir
-
-## 🗃️ Schema do Banco
+## Schema do Banco
 
 ```sql
 -- Usuários
@@ -361,7 +142,7 @@ CREATE TABLE usuarios (
     criadoEm TIMESTAMP DEFAULT NOW()
 );
 
--- Categorias (relacionadas a usuário)
+-- Categorias
 CREATE TABLE categorias (
     id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
     nome VARCHAR NOT NULL,
@@ -370,7 +151,7 @@ CREATE TABLE categorias (
     criadoEm TIMESTAMP DEFAULT NOW()
 );
 
--- Transações (relacionadas a usuário, categoria opcional)
+-- Transações
 CREATE TABLE transacoes (
     id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
     titulo VARCHAR NOT NULL,
@@ -384,25 +165,5 @@ CREATE TABLE transacoes (
 );
 ```
 
-## 🔐 Segurança
-
-- Senhas hash com bcrypt
-- Autenticação JWT
-- Middlewares de validação
-- Sanitização de inputs
-- CORS configurado
-- Rate limiting (produção)
-
-## 📈 Performance
-
-- Queries otimizadas (TypeORM)
-- Paginação em todas as listagens
-- Índices no banco de dados
-- Lazy loading no frontend
-- Cache de estado (signals)
-
----
-
 **Desenvolvido por**: Matheus Faustino
-**Tecnologias**: Node.js, React, PostgreSQL, TypeScript
-**Padrões**: REST API, Clean Architecture, Material Design
+# Teste-T-cnico-Gerenciador-de-Finan-as-Pessoais-
