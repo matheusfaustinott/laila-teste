@@ -8,10 +8,10 @@ Sistema completo de gestão financeira pessoal construído com **Node.js**, **Re
 
 ```bash
 # Clone o repositório
-git clone
-cd laila-teste
+git clone https://github.com/matheusfaustinott/teste-laila.git
+cd teste-laila
 
-# Execute
+# Execute (o .env já está configurado para desenvolvimento)
 docker-compose up -d
 
 #logs em tempo real
