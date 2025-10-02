@@ -1,0 +1,56 @@
+{
+  "name": "sistema-financeiro-backend",
+  "version": "1.0.0",
+  "main": "dist/server.js",
+  "scripts": {
+    "dev": "ts-node-dev --respawn --transpile-only src/server.ts",
+    "build": "tsc",
+    "start": "node dist/server.js",
+    "typeorm": "ts-node-dev ./node_modules/typeorm/cli.js -d src/database/db.ts",
+    "migration:generate": "npm run typeorm -- migration:generate",
+    "migration:create": "npm run typeorm -- migration:create",
+    "migration:run": "npm run typeorm -- migration:run",
+    "migration:revert": "npm run typeorm -- migration:revert",
+    "schema:drop": "npm run typeorm -- schema:drop",
+    "db:reset": "npm run schema:drop && npm run migration:run",
+    "test": "jest",
+    "test:watch": "jest --watch",
+    "lint": "echo \"ESLint não configurado ainda\" && exit 0"
+  },
+  "keywords": [
+    "finance",
+    "api",
+    "typescript",
+    "express",
+    "typeorm",
+    "postgresql"
+  ],
+  "author": "Matheus Faustino",
+  "license": "MIT",
+  "description": "Sistema de Controle Financeiro Pessoal - Backend API",
+  "dependencies": {
+    "bcrypt": "^6.0.0",
+    "cors": "^2.8.5",
+    "dotenv": "^17.2.2",
+    "express": "^5.1.0",
+    "http-status-codes": "^2.3.0",
+    "jsonwebtoken": "^9.0.2",
+    "pg": "^8.16.3",
+    "reflect-metadata": "^0.2.2",
+    "typeorm": "^0.3.27"
+  },
+  "devDependencies": {
+    "@types/bcrypt": "^6.0.0",
+    "@types/cors": "^2.8.19",
+    "@types/express": "^5.0.3",
+    "@types/jest": "^30.0.0",
+    "@types/jsonwebtoken": "^9.0.10",
+    "@types/node": "^24.6.0",
+    "@types/supertest": "^6.0.3",
+    "jest": "^30.2.0",
+    "supertest": "^7.1.4",
+    "ts-jest": "^29.4.4",
+    "ts-node-dev": "^2.0.0",
+    "typescript": "^5.9.2"
+  }
+}

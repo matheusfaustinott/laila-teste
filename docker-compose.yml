@@ -1,0 +1,68 @@
+version: "3.8"
+
+services:
+  # Banco de dados PostgreSQL
+  db:
+    image: postgres:15-alpine
+    container_name: laila_db
+    environment:
+      POSTGRES_DB: laila
+      POSTGRES_USER: admin
+      POSTGRES_PASSWORD: admin
+      POSTGRES_HOST_AUTH_METHOD: md5
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U admin -d laila"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - laila_network
+
+  # Backend API
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: laila_backend
+    environment:
+      NODE_ENV: production
+      DB_HOST: db
+      DB_PORT: 5432
+      DB_USERNAME: admin
+      DB_PASSWORD: admin
+      DB_DATABASE: laila
+      JWT_SECRET: 8f3e9d2a7b5c1e4f6a9b8c0d3e2f1a4b7c6d9e8f0a1b2c5d4e3f6a7b8c9d0e1f2
+      JWT_EXPIRATION: 24h
+      PORT: 3001
+    ports:
+      - "3001:3001"
+    depends_on:
+      db:
+        condition: service_healthy
+    networks:
+      - laila_network
+
+  # Frontend React
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    container_name: laila_frontend
+    ports:
+      - "3000:80"
+    depends_on:
+      - backend
+    networks:
+      - laila_network
+
+volumes:
+  postgres_data:
+    driver: local
+
+networks:
+  laila_network:
+    driver: bridge
