@@ -25,7 +25,11 @@ import { useEffect } from "react";
 import { irParaDashboard } from "../estado/navegacao";
 import { transacoesAPI } from "../servicos/api";
 import strings from "../strings";
-import { formatarMoeda } from "../utils/formatadores";
+import {
+  formatarData,
+  formatarMes,
+  formatarMoeda,
+} from "../utils/formatadores";
 
 const ResumoMensal = () => {
   useSignals();
@@ -42,7 +46,9 @@ const ResumoMensal = () => {
     carregando.value = true;
 
     const callbackSucesso = (dados) => {
+      console.log("Dados recebidos no callback:", dados);
       resumo.value = dados;
+      console.log("Resumo signal após atualização:", resumo.value);
       carregando.value = false;
     };
 
@@ -58,10 +64,6 @@ const ResumoMensal = () => {
       callbackErro
     );
   };
-
-  const formatarMes = (mes) => {
-    return strings.resumo.arrayMeses[mes - 1];
-  }; // n pode ta aqui
 
   const gerarOpcoesAno = () => {
     const anoAtual = new Date().getFullYear();
@@ -151,7 +153,7 @@ const ResumoMensal = () => {
               <Button
                 variant="outlined"
                 onClick={obterResumoMensal}
-                disabled={carregando}
+                disabled={carregando.value}
                 fullWidth
               >
                 {carregando.value
@@ -170,66 +172,120 @@ const ResumoMensal = () => {
             gutterBottom
             sx={{ textAlign: "center", mb: 3 }}
           >
-            {strings.resumo.resumoDe} {formatarMes(resumo.value.periodo.mes)}{" "}
-            {resumo.value.periodo.ano} // revisar
+            {resumo.value?.periodo?.mes && resumo.value?.periodo?.ano
+              ? `${strings.resumo.resumoDe} ${formatarMes(
+                  resumo.value.periodo.mes
+                )} ${resumo.value.periodo.ano}`
+              : strings.resumo.resumoDe + " período selecionado"}
           </Typography>
-          <Grid container spacing={3} sx={{ marginBottom: 3 }}>
-            <Grid item xs={12} md={4}>
-              <Card>
-                <CardContent>
-                  <Box sx={{ display: "flex", alignItems: "center", gap: 2 }}>
-                    <TrendingUp sx={{ color: "success.main", fontSize: 40 }} />
-                    <Box>
-                      <Typography variant="h6" color="success.main">
-                        {strings.resumo.receitas}
-                      </Typography>
-                      <Typography variant="h4">
-                        {formatarMoeda(resumo.value.totalReceitas)}
-                      </Typography>
-                    </Box>
-                  </Box>
-                </CardContent>
-              </Card>
-            </Grid>
-            <Grid item xs={12} md={4}>
-              <Card>
-                <CardContent>
-                  <Box sx={{ display: "flex", alignItems: "center", gap: 2 }}>
-                    <TrendingDown sx={{ color: "error.main", fontSize: 40 }} />
-                    <Box>
-                      <Typography variant="h6" color="error.main">
-                        {strings.resumo.despesas}
-                      </Typography>
-                      <Typography variant="h4">
-                        {formatarMoeda(resumo.value.totalDespesas)}
-                      </Typography>
-                    </Box>
-                  </Box>
-                </CardContent>
-              </Card>
-            </Grid>
-            <Grid item xs={12} md={4}>
-              <Card>
-                <CardContent>
-                  <Box sx={{ display: "flex", alignItems: "center", gap: 2 }}>
-                    <Assessment
+          <Grid container spacing={2} sx={{ marginBottom: 3 }}>
+            <Grid item xs={4} sm={4} md={4}>
+              <Card sx={{ height: "100%" }}>
+                <CardContent sx={{ padding: { xs: 1, sm: 2 } }}>
+                  <Box
+                    sx={{
+                      display: "flex",
+                      flexDirection: { xs: "column", sm: "row" },
+                      alignItems: "center",
+                      gap: { xs: 1, sm: 2 },
+                      textAlign: { xs: "center", sm: "left" },
+                    }}
+                  >
+                    <TrendingUp
                       sx={{
-                        color: obterCorSaldo(resumo.value.saldo),
-                        fontSize: 40,
+                        color: "success.main",
+                        fontSize: { xs: 24, sm: 40 },
                       }}
                     />
                     <Box>
                       <Typography
-                        variant="h6"
-                        sx={{ color: obterCorSaldo(resumo.value.saldo) }}
+                        variant="body2"
+                        color="success.main"
+                        sx={{ fontSize: { xs: "0.75rem", sm: "1rem" } }}
                       >
-                        {obterTextoSaldo(resumo.value.saldo)}
+                        {strings.resumo.receitas}
                       </Typography>
                       <Typography
-                        variant="h4"
-                        sx={{ color: obterCorSaldo(resumo.value.saldo) }}
+                        variant="h6"
+                        sx={{ fontSize: { xs: "0.9rem", sm: "1.5rem" } }}
                       >
-                        {formatarMoeda(resumo.value.saldo)}
+                        {formatarMoeda(resumo.value.totalReceitas || 0)}
+                      </Typography>
+                    </Box>
+                  </Box>
+                </CardContent>
+              </Card>
+            </Grid>
+            <Grid item xs={4} sm={4} md={4}>
+              <Card sx={{ height: "100%" }}>
+                <CardContent sx={{ padding: { xs: 1, sm: 2 } }}>
+                  <Box
+                    sx={{
+                      display: "flex",
+                      flexDirection: { xs: "column", sm: "row" },
+                      alignItems: "center",
+                      gap: { xs: 1, sm: 2 },
+                      textAlign: { xs: "center", sm: "left" },
+                    }}
+                  >
+                    <TrendingDown
+                      sx={{ color: "error.main", fontSize: { xs: 24, sm: 40 } }}
+                    />
+                    <Box>
+                      <Typography
+                        variant="body2"
+                        color="error.main"
+                        sx={{ fontSize: { xs: "0.75rem", sm: "1rem" } }}
+                      >
+                        {strings.resumo.despesas}
+                      </Typography>
+                      <Typography
+                        variant="h6"
+                        sx={{ fontSize: { xs: "0.9rem", sm: "1.5rem" } }}
+                      >
+                        {formatarMoeda(resumo.value.totalDespesas || 0)}
+                      </Typography>
+                    </Box>
+                  </Box>
+                </CardContent>
+              </Card>
+            </Grid>
+            <Grid item xs={4} sm={4} md={4}>
+              <Card sx={{ height: "100%" }}>
+                <CardContent sx={{ padding: { xs: 1, sm: 2 } }}>
+                  <Box
+                    sx={{
+                      display: "flex",
+                      flexDirection: { xs: "column", sm: "row" },
+                      alignItems: "center",
+                      gap: { xs: 1, sm: 2 },
+                      textAlign: { xs: "center", sm: "left" },
+                    }}
+                  >
+                    <Assessment
+                      sx={{
+                        color: obterCorSaldo(resumo.value.saldo || 0),
+                        fontSize: { xs: 24, sm: 40 },
+                      }}
+                    />
+                    <Box>
+                      <Typography
+                        variant="body2"
+                        sx={{
+                          color: obterCorSaldo(resumo.value.saldo || 0),
+                          fontSize: { xs: "0.75rem", sm: "1rem" },
+                        }}
+                      >
+                        {obterTextoSaldo(resumo.value.saldo || 0)}
+                      </Typography>
+                      <Typography
+                        variant="h6"
+                        sx={{
+                          color: obterCorSaldo(resumo.value.saldo || 0),
+                          fontSize: { xs: "0.9rem", sm: "1.5rem" },
+                        }}
+                      >
+                        {formatarMoeda(resumo.value.saldo || 0)}
                       </Typography>
                     </Box>
                   </Box>
@@ -246,14 +302,17 @@ const ResumoMensal = () => {
                 <Grid item xs={12} sm={6}>
                   <Typography variant="body1">
                     <strong>{strings.resumo.totalTransacoes}:</strong>{" "}
-                    {resumo.value.quantidadeTransacoes} // revisar
+                    {resumo.value.quantidadeTransacoes || 0}
                   </Typography>
                 </Grid>
                 <Grid item xs={12} sm={6}>
                   <Typography variant="body1">
                     <strong>{strings.resumo.periodo}:</strong>{" "}
-                    {formatarMes(resumo.value.periodo.mes)} de{" "}
-                    {resumo.value.periodo.ano} // revisar
+                    {resumo.value?.periodo?.mes && resumo.value?.periodo?.ano
+                      ? `${formatarMes(resumo.value.periodo.mes)} de ${
+                          resumo.value.periodo.ano
+                        }`
+                      : "Dados não disponíveis"}
                   </Typography>
                 </Grid>
               </Grid>
@@ -265,7 +324,7 @@ const ResumoMensal = () => {
                 {strings.resumo.receitasPorCategoria}
               </Typography>
               <List>
-                {Object.entries(resumo.value.receitasPorCategoria).map(
+                {Object.entries(resumo.value.receitasPorCategoria || {}).map(
                   ([categoria, valor]) => (
                     <ListItem key={categoria} divider>
                       <ListItemText
@@ -284,7 +343,7 @@ const ResumoMensal = () => {
                 {strings.resumo.despesasPorCategoria}
               </Typography>
               <List>
-                {Object.entries(resumo.value.despesasPorCategoria).map(
+                {Object.entries(resumo.value.despesasPorCategoria || {}).map(
                   ([categoria, valor]) => (
                     <ListItem key={categoria} divider>
                       <ListItemText
@@ -345,9 +404,7 @@ const ResumoMensal = () => {
                                   strings.resumo.semCategoria}
                               </Typography>
                               <Typography variant="body2" color="textSecondary">
-                                {new Date(transacao.data).toLocaleDateString(
-                                  "pt-BR"
-                                )} // usar formatar data
+                                {formatarData(transacao.data)}
                               </Typography>
                             </Box>
                           }
@@ -359,7 +416,7 @@ const ResumoMensal = () => {
               </Card>
             )}
         </>
-      ) : carregando ? (
+      ) : carregando.value ? (
         <Box sx={{ textAlign: "center", padding: 4 }}>
           <Typography variant="h6">
             {strings.resumo.carregandoResumo}

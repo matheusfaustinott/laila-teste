@@ -27,3 +27,25 @@ export const formatarPorcentagem = (valor, decimais = 1) => {
     maximumFractionDigits: decimais,
   }).format(valor / 100);
 };
+
+export const formatarMes = (numeroMes) => {
+  if (!numeroMes || isNaN(numeroMes)) {
+    return "-";
+  }
+
+  const meses = [
+    "Janeiro",
+    "Fevereiro",
+    "Março",
+    "Abril",
+    "Maio",
+    "Junho",
+    "Julho",
+    "Agosto",
+    "Setembro",
+    "Outubro",
+    "Novembro",
+    "Dezembro",
+  ];
+  return meses[numeroMes - 1] || "Mês inválido";
+};

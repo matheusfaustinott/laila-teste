@@ -2,14 +2,16 @@
 
 Sistema completo de gestão financeira pessoal construído com **Node.js**, **React** e **PostgreSQL**.
 
-## (Teste Técnico)
+## Instalação e Execução
+
+### Opção 1: Docker - produção
 
 **Requisito único**: Docker e Docker Compose instalados apenas.
 
 ```bash
 # Clone o repositório
-git clone https://github.com/matheusfaustinott/teste-laila.git
-cd teste-laila
+git clone https://github.com/matheusfaustinott/laila-teste.git
+cd laila-teste
 
 # Execute (o .env já está configurado para desenvolvimento)
 docker-compose up -d
@@ -23,11 +25,44 @@ docker-compose down -v && docker-compose up --build
 
 > **Aviso importante**: Se encontrar erro com `docker-compose up --build`, use primeiro `docker-compose build` e depois `docker-compose up -d` para uma execução mais estável.
 
+### Opção 2: Desenvolvedor
+
+**Requisitos**: Node.js 18+, Docker (apenas para PostgreSQL).
+
+```bash
+# Clone o repositório
+git clone https://github.com/matheusfaustinott/laila-teste.git
+cd laila-teste
+
+# 1. Suba apenas o PostgreSQL via Docker
+docker-compose -f docker-compose.dev.yml up -d
+
+# 2. Aguarde o banco estar pronto (aguarde ~10 segundos)
+docker-compose -f docker-compose.dev.yml logs postgres
+
+# 3. Configure e execute o backend
+cd backend
+npm install
+
+# Execute as migrações para criar tabelas
+npm run migration:run
+
+# Inicie o servidor backend
+npm run dev
+
+# 4. Execute o frontend (novo terminal)
+cd frontend
+npm install
+npm start
+```
+
+**URLs de Acesso:**
+
 - **Frontend**: http://localhost:3000
 - **Backend**: http://localhost:3001
 - **Documentação**: http://localhost:3001/api/info
 
-### Docker
+### Estrutura Docker
 
 ```
 ├── docker-compose.yml
@@ -61,36 +96,67 @@ docker-compose down -v && docker-compose up --build
 
 ## Comandos Úteis
 
-```bash
-# Ver status dos containers
-docker-compose ps
+### Docker
 
-# Ver logs em tempo real
+```bash
+# Docker completo (produção)
+docker-compose up -d
 docker-compose logs -f
 
-# Ver logs de um serviço específico
-docker-compose logs backend
-docker-compose logs frontend
+# Apenas PostgreSQL (desenvolvimento)
+docker-compose -f docker-compose.dev.yml up -d
+docker-compose -f docker-compose.dev.yml logs postgres
 
-# Parar tudo
-docker-compose down
+# Ver status dos containers
+docker-compose ps
+docker-compose -f docker-compose.dev.yml ps
 
-# Reset completo
-docker-compose down -v && docker-compose up --build
+# Parar containers
+docker-compose down                        # Produção
+docker-compose -f docker-compose.dev.yml down  # Desenvolvimento
 
-# Rebuild específico
-docker-compose build backend
-docker-compose build frontend
-docker-compose up -d
+# Reset completo do banco de desenvolvimento
+docker-compose -f docker-compose.dev.yml down -v
+docker-compose -f docker-compose.dev.yml up -d
 
 # Verificar se está funcionando
 curl http://localhost:3001/api/health
 curl http://localhost:3000
 ```
 
+### Desenvolvimento
+
+```bash
+# PostgreSQL (desenvolvimento)
+docker-compose -f docker-compose.dev.yml up -d     # Subir banco
+docker-compose -f docker-compose.dev.yml logs postgres  # Ver logs do banco
+docker-compose -f docker-compose.dev.yml down      # Parar banco
+docker-compose -f docker-compose.dev.yml down -v   # Reset completo (apaga dados)
+
+# Verificar se banco está pronto
+docker-compose -f docker-compose.dev.yml ps
+
+# Migrações do banco (após npm install no backend)
+cd backend
+npm run migration:run           # Executar migrações (criar tabelas)
+npm run migration:generate      # Gerar nova migração
+npm run migration:revert        # Reverter última migração
+
+# Backend
+npm run dev          # Servidor em modo watch
+npm run build        # Build para produção
+
+# Frontend
+cd frontend
+npm start            # Servidor de desenvolvimento
+npm run build        # Build para produção
+```
+
 ## Troubleshooting
 
-**Problema**: Erro `'ContainerConfig'` no docker-compose up --build -> isso se da pela versão do docker-compose
+### Docker
+
+**Problema**: Erro `'ContainerConfig'` no docker-compose up --build
 
 **Solução**:
 
@@ -100,12 +166,14 @@ docker-compose build
 docker-compose up -d
 ```
 
-**Problema**: Containers não iniciam
-**Solução**:
+**Verificar configuração do .env**:
 
 ```bash
-docker-compose ps
-docker-compose logs <nome-servico>
+DB_HOST=localhost
+DB_PORT=5432
+DB_USERNAME=admin
+DB_PASSWORD=admin
+DB_DATABASE=laila
 ```
 
 ## Endpoints

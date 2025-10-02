@@ -18,7 +18,7 @@ const tratarErro = (error, callbackErro = null) => {
   let titulo = strings.geral.erro;
 
   if (error.response) {
-    console.log("Erro de resposta da API:", error.response);
+    console.log("Erro da API:", error.response);
     mensagem = error.response.data?.mensagem || strings.geral.erroGeral;
 
     if (error.response.status === 401) {
@@ -293,7 +293,7 @@ export const transacoesAPI = {
         }
       )
       .then((response) => {
-        const dados = response.data.dados;
+        const dados = response.data.dados.resumo;
         if (callbackSucesso) {
           callbackSucesso(dados);
         }

@@ -397,16 +397,18 @@ export const obterResumoMensal = async (
     const despesasPorCategoria: { [key: string]: number } = {};
 
     transacoes.forEach((transacao) => {
+      const valor = parseFloat(transacao.valor.toString());
+
       if (transacao.tipo === "receita") {
-        totalReceitas += transacao.valor;
+        totalReceitas += valor;
         const categoria = transacao.categoria?.nome || "Sem categoria";
         receitasPorCategoria[categoria] =
-          (receitasPorCategoria[categoria] || 0) + transacao.valor;
+          (receitasPorCategoria[categoria] || 0) + valor;
       } else {
-        totalDespesas += transacao.valor;
+        totalDespesas += valor;
         const categoria = transacao.categoria?.nome || "Sem categoria";
         despesasPorCategoria[categoria] =
-          (despesasPorCategoria[categoria] || 0) + transacao.valor;
+          (despesasPorCategoria[categoria] || 0) + valor;
       }
     });
 
@@ -421,12 +423,15 @@ export const obterResumoMensal = async (
       receitasPorCategoria,
       despesasPorCategoria,
       transacoesMaiores: transacoes
-        .sort((a, b) => b.valor - a.valor)
+        .sort(
+          (a, b) =>
+            parseFloat(b.valor.toString()) - parseFloat(a.valor.toString())
+        )
         .slice(0, 5)
         .map((t) => ({
           id: t.id,
           titulo: t.titulo,
-          valor: t.valor,
+          valor: parseFloat(t.valor.toString()),
           tipo: t.tipo,
           data: t.data,
           categoria: t.categoria?.nome || null,

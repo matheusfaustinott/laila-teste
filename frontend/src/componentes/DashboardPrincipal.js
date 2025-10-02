@@ -3,7 +3,6 @@ import {
   Assessment,
   Category,
   ExitToApp,
-  HealthAndSafety,
   TrendingUp,
 } from "@mui/icons-material";
 import {
@@ -15,8 +14,7 @@ import {
   Chip,
   Typography,
 } from "@mui/material";
-import { useSignal, useSignals } from "@preact/signals-react/runtime";
-import axios from "axios";
+import { useSignals } from "@preact/signals-react/runtime";
 import { fazerLogout, usuarioLogado } from "../estado/autenticacao";
 import { mostrarModalConfirmacao } from "../estado/modais";
 import {
@@ -29,20 +27,6 @@ import strings from "../strings";
 
 const DashboardPrincipal = () => {
   useSignals();
-  const statusSaude = useSignal(null);
-  const verificandoSaude = useSignal(false);
-
-  const verificarSaude = async () => {
-    verificandoSaude.value = true;
-    try {
-      const response = await axios.get("/api/health");
-      statusSaude.value = "ok";
-    } catch (error) {
-      statusSaude.value = "erro";
-    } finally {
-      verificandoSaude.value = false;
-    }
-  };
 
   const handleLogout = () => {
     mostrarModalConfirmacao(
@@ -192,56 +176,6 @@ const DashboardPrincipal = () => {
           </CardContent>
         </Card>
       </Box>
-      <Card sx={{ marginTop: 3, backgroundColor: "#f5f5f5" }}>
-        <CardContent>
-          <Box
-            sx={{
-              display: "flex",
-              justifyContent: "space-between",
-              alignItems: "center",
-              marginBottom: 2,
-            }}
-          >
-            <Typography variant="h6">{strings.geral.statusSistema}</Typography>
-            <Button
-              variant="outlined"
-              size="small"
-              startIcon={<HealthAndSafety />}
-              onClick={verificarSaude}
-              disabled={verificandoSaude.value}
-              color={
-                statusSaude.value === "ok"
-                  ? "success"
-                  : statusSaude.value === "erro"
-                  ? "error"
-                  : "primary"
-              }
-            >
-              {verificandoSaude.value
-                ? strings.geral.verificandoSaude
-                : strings.geral.verificarSaude}
-            </Button>
-          </Box>
-
-          {statusSaude.value && (
-            <Box sx={{ marginBottom: 2 }}>
-              <Typography
-                variant="body2"
-                color={
-                  statusSaude.value === "ok" ? "success.main" : "error.main"
-                }
-              >
-                {statusSaude.value === "ok"
-                  ? strings.geral.saudeOK
-                  : strings.geral.saudeErro}
-              </Typography>
-            </Box>
-          )}
-          <Typography variant="caption" color="textSecondary">
-            {strings.geral.desenvolvedor}
-          </Typography>
-        </CardContent>
-      </Card>
     </Box>
   );
 };
