@@ -1,0 +1,16 @@
+node_modules
+npm-debug.log
+build
+.env
+.env.local
+.env.*.local
+coverage
+.cache
+.parcel-cache
+.DS_Store
+.vscode
+.git
+.gitignore
+README.md
+Dockerfile
+*.md
