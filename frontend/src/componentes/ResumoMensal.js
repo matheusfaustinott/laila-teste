@@ -30,7 +30,7 @@ import { formatarMoeda } from "../utils/formatadores";
 const ResumoMensal = () => {
   useSignals();
   const resumo = useSignal(null);
-  const carregando = useSignal(false);
+  const carregando = useSignal(false); // verificar todos ponto value
   const ano = useSignal(new Date().getFullYear());
   const mes = useSignal(new Date().getMonth() + 1);
 
@@ -61,7 +61,7 @@ const ResumoMensal = () => {
 
   const formatarMes = (mes) => {
     return strings.resumo.arrayMeses[mes - 1];
-  };
+  }; // n pode ta aqui
 
   const gerarOpcoesAno = () => {
     const anoAtual = new Date().getFullYear();
@@ -171,7 +171,7 @@ const ResumoMensal = () => {
             sx={{ textAlign: "center", mb: 3 }}
           >
             {strings.resumo.resumoDe} {formatarMes(resumo.value.periodo.mes)}{" "}
-            {resumo.value.periodo.ano}
+            {resumo.value.periodo.ano} // revisar
           </Typography>
           <Grid container spacing={3} sx={{ marginBottom: 3 }}>
             <Grid item xs={12} md={4}>
@@ -246,14 +246,14 @@ const ResumoMensal = () => {
                 <Grid item xs={12} sm={6}>
                   <Typography variant="body1">
                     <strong>{strings.resumo.totalTransacoes}:</strong>{" "}
-                    {resumo.value.quantidadeTransacoes}
+                    {resumo.value.quantidadeTransacoes} // revisar
                   </Typography>
                 </Grid>
                 <Grid item xs={12} sm={6}>
                   <Typography variant="body1">
                     <strong>{strings.resumo.periodo}:</strong>{" "}
                     {formatarMes(resumo.value.periodo.mes)} de{" "}
-                    {resumo.value.periodo.ano}
+                    {resumo.value.periodo.ano} // revisar
                   </Typography>
                 </Grid>
               </Grid>
@@ -347,7 +347,7 @@ const ResumoMensal = () => {
                               <Typography variant="body2" color="textSecondary">
                                 {new Date(transacao.data).toLocaleDateString(
                                   "pt-BR"
-                                )}
+                                )} // usar formatar data
                               </Typography>
                             </Box>
                           }

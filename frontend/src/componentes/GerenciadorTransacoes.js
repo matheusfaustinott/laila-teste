@@ -86,7 +86,7 @@ const GerenciadorTransacoes = () => {
     termoBusca.value = event.target.value;
   };
 
-  const stats = estatisticasTransacoes.value;
+  const stats = estatisticasTransacoes.value; // n faz sentido
 
   return (
     <Box
@@ -275,7 +275,7 @@ const GerenciadorTransacoes = () => {
                     <Select
                       value={filtrosCategoria.value || ""}
                       onChange={handleFiltroCategoria}
-                      label="Categoria"
+                      label="Categoria" // strings
                     >
                       <MenuItem value="">{strings.transacoes.todas}</MenuItem>
                       {categorias.value.map((categoria) => (
@@ -335,7 +335,7 @@ const GerenciadorTransacoes = () => {
               </CardContent>
             </Card>
             <ListaTransacoes
-              transacoes={transacoesFiltradas.value}
+              transacoes={transacoesFiltradas.value} // n preciso passar como props
               onAtualizar={carregarTransacoes}
             />
           </CardContent>

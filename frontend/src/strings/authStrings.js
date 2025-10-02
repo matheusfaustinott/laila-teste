@@ -18,6 +18,8 @@ export const stringsAutenticacao = {
   carregandoLogout: "Saindo...",
   sucessoLogin: "Login realizado com sucesso!",
   sucessoCadastro: "Cadastro realizado com sucesso!",
+  sucessoCadastroDescricao:
+    "Sua conta foi criada! Agora você pode fazer login com suas credenciais.",
   sucessoLogout: "Logout realizado com sucesso!",
   tituloConfirmacaoLogout: "Confirmar Logout",
   mensagemConfirmacaoLogout: "Você tem certeza que deseja sair do sistema?",

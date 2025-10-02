@@ -56,7 +56,7 @@ const GerenciadorCategorias = () => {
 
   const carregarCategorias = () => {
     categoriasAPI.listar(
-      {},
+      {}, // ta pasando vazio
       (dados) => {
         categorias.value = dados.categorias || [];
       },
@@ -66,7 +66,7 @@ const GerenciadorCategorias = () => {
     );
   };
 
-  const abrirFormularioNovo = () => {
+  const abrirFormularioNovo = () => { // utilizar bath
     resetarFormularioCategoria();
     modoEdicaoCategoria.value = false;
     mostrandoFormularioCategoria.value = true;

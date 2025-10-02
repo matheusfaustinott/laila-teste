@@ -21,7 +21,10 @@ import {
   limparErro,
   mostrandoLogin,
 } from "../estado/autenticacao";
-import { mostrarModalErroCredenciais } from "../estado/modais";
+import {
+  mostrarModalErro,
+  mostrarModalErroCredenciais,
+} from "../estado/modais";
 import { authFields } from "../fields";
 import { autenticacaoAPI } from "../servicos/api";
 import strings from "../strings";
@@ -37,10 +40,24 @@ const FormularioAutenticacao = () => {
   const aoEnviar = async (dados) => {
     limparErro();
 
-    const callbackSucesso = (resposta) => {
+    const callbackSucessoLogin = (resposta) => {
       if (resposta.sucesso && resposta.dados) {
         fazerLogin(resposta.dados.usuario, resposta.dados.token);
         reset();
+      }
+    };
+
+    const callbackSucessoCadastro = (resposta) => {
+      if (resposta.sucesso) {
+        mostrarModalErro(
+          strings.autenticacao.sucessoCadastro,
+          strings.autenticacao.sucessoCadastroDescricao,
+          "success",
+          () => {
+            reset();
+            mostrandoLogin.value = true;
+          }
+        );
       }
     };
 
@@ -73,7 +90,7 @@ const FormularioAutenticacao = () => {
       autenticacaoAPI.login(
         dados.email,
         dados.senha,
-        callbackSucesso,
+        callbackSucessoLogin,
         callbackErro
       );
     } else {
@@ -81,7 +98,7 @@ const FormularioAutenticacao = () => {
         dados.nomeCompleto,
         dados.email,
         dados.senha,
-        callbackSucesso,
+        callbackSucessoCadastro,
         callbackErro
       );
     }
