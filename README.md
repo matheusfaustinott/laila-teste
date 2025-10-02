@@ -166,4 +166,3 @@ CREATE TABLE transacoes (
 ```
 
 **Desenvolvido por**: Matheus Faustino
-# Teste-T-cnico-Gerenciador-de-Finan-as-Pessoais-
