@@ -3,6 +3,7 @@ import {
   Assessment,
   Category,
   ExitToApp,
+  HealthAndSafety,
   TrendingUp,
 } from "@mui/icons-material";
 import {
@@ -14,7 +15,8 @@ import {
   Chip,
   Typography,
 } from "@mui/material";
-import { useSignals } from "@preact/signals-react/runtime";
+import { useSignal, useSignals } from "@preact/signals-react/runtime";
+import axios from "axios";
 import { fazerLogout, usuarioLogado } from "../estado/autenticacao";
 import { mostrarModalConfirmacao } from "../estado/modais";
 import {
@@ -27,21 +29,32 @@ import strings from "../strings";
 
 const DashboardPrincipal = () => {
   useSignals();
+  const statusSaude = useSignal(null);
+  const verificandoSaude = useSignal(false);
 
-  // Função para mostrar confirmação de logout
+  const verificarSaude = async () => {
+    verificandoSaude.value = true;
+    try {
+      const response = await axios.get("/api/health");
+      statusSaude.value = "ok";
+    } catch (error) {
+      statusSaude.value = "erro";
+    } finally {
+      verificandoSaude.value = false;
+    }
+  };
+
   const handleLogout = () => {
     mostrarModalConfirmacao(
       strings.autenticacao.tituloConfirmacaoLogout,
       strings.autenticacao.mensagemConfirmacaoLogout,
       () => {
-        // Callback de confirmação
         const callbackSucesso = () => {
           fazerLogout();
         };
-
         autenticacaoAPI.logout(callbackSucesso);
       },
-      null, // Callback de cancelamento (padrão)
+      null,
       {
         textoConfirmar: strings.autenticacao.botaoLogout,
         textoCancelar: strings.geral.cancelar,
@@ -49,8 +62,7 @@ const DashboardPrincipal = () => {
       }
     );
   };
-
-  // Extrai primeira letra do nome para o avatar
+  // Avatar do user
   const primeiraLetra = usuarioLogado.value?.nomeCompleto?.charAt(0);
 
   return (
@@ -62,7 +74,6 @@ const DashboardPrincipal = () => {
         padding: 2,
       }}
     >
-      {/* Header */}
       <Box
         sx={{
           display: "flex",
@@ -84,8 +95,6 @@ const DashboardPrincipal = () => {
           {strings.autenticacao.botaoLogout}
         </Button>
       </Box>
-
-      {/* Card de boas-vindas */}
       <Card sx={{ marginBottom: 3 }}>
         <CardContent>
           <Box sx={{ display: "flex", alignItems: "center", gap: 2 }}>
@@ -94,7 +103,10 @@ const DashboardPrincipal = () => {
             </Avatar>
             <Box>
               <Typography variant="h5" gutterBottom>
-                Olá, {usuarioLogado.value?.nomeCompleto || "Usuário"}!
+                {strings.geral.saudacaoUsuario.replace(
+                  "{nome}",
+                  usuarioLogado.value?.nomeCompleto || "Usuário"
+                )}
               </Typography>
               <Typography variant="body1" color="textSecondary">
                 {strings.geral.bemVindoCompleto}
@@ -109,8 +121,6 @@ const DashboardPrincipal = () => {
           </Box>
         </CardContent>
       </Card>
-
-      {/* Cards de funcionalidades */}
       <Box
         sx={{
           display: "grid",
@@ -118,7 +128,6 @@ const DashboardPrincipal = () => {
           gridTemplateColumns: "repeat(auto-fit, minmax(300px, 1fr))",
         }}
       >
-        {/* Card Transações */}
         <Card>
           <CardContent>
             <Box
@@ -132,16 +141,14 @@ const DashboardPrincipal = () => {
               <TrendingUp color="primary" />
               <Typography variant="h6">{strings.geral.transacoes}</Typography>
             </Box>
-            <Typography variant="body2" color="textSecondary" paragraph>
+            <Typography variant="body2" color="textSecondary">
               {strings.geral.gerencieTransacoesTexto}
             </Typography>
             <Button variant="contained" size="small" onClick={irParaTransacoes}>
-              Acessar
+              {strings.geral.acessar}
             </Button>
           </CardContent>
         </Card>
-
-        {/* Card Categorias */}
         <Card>
           <CardContent>
             <Box
@@ -155,16 +162,14 @@ const DashboardPrincipal = () => {
               <Category color="primary" />
               <Typography variant="h6">{strings.geral.categorias}</Typography>
             </Box>
-            <Typography variant="body2" color="textSecondary" paragraph>
+            <Typography variant="body2" color="textSecondary">
               {strings.geral.organizeCategorias}
             </Typography>
             <Button variant="contained" size="small" onClick={irParaCategorias}>
-              Acessar
+              {strings.geral.acessar}
             </Button>
           </CardContent>
         </Card>
-
-        {/* Card Relatórios */}
         <Card>
           <CardContent>
             <Box
@@ -178,39 +183,62 @@ const DashboardPrincipal = () => {
               <Assessment color="primary" />
               <Typography variant="h6">{strings.geral.resumoMensal}</Typography>
             </Box>
-            <Typography variant="body2" color="textSecondary" paragraph>
+            <Typography variant="body2" color="textSecondary">
               {strings.geral.acompanheResumo}
             </Typography>
             <Button variant="contained" size="small" onClick={irParaResumo}>
-              Acessar
+              {strings.geral.acessar}
             </Button>
           </CardContent>
         </Card>
       </Box>
-
-      {/* Informações de desenvolvimento */}
       <Card sx={{ marginTop: 3, backgroundColor: "#f5f5f5" }}>
         <CardContent>
-          <Typography variant="h6" gutterBottom>
-            {strings.geral.statusSistema}
-          </Typography>
-          <Typography variant="body2" paragraph>
-            ✅ Autenticação funcionando
-            <br />
-            {strings.geral.sistemaSignals}
-            <br />
-            ✅ Interface com Material-UI
-            <br />
-            ✅ Formulários com React Hook Form
-            <br />
-            ✅ Padrão de cores Lailla aplicado
-            <br />
-            ✅ Componentes em minúscula
-            <br />
-            🔄 Funcionalidades em desenvolvimento...
-          </Typography>
+          <Box
+            sx={{
+              display: "flex",
+              justifyContent: "space-between",
+              alignItems: "center",
+              marginBottom: 2,
+            }}
+          >
+            <Typography variant="h6">{strings.geral.statusSistema}</Typography>
+            <Button
+              variant="outlined"
+              size="small"
+              startIcon={<HealthAndSafety />}
+              onClick={verificarSaude}
+              disabled={verificandoSaude.value}
+              color={
+                statusSaude.value === "ok"
+                  ? "success"
+                  : statusSaude.value === "erro"
+                  ? "error"
+                  : "primary"
+              }
+            >
+              {verificandoSaude.value
+                ? strings.geral.verificandoSaude
+                : strings.geral.verificarSaude}
+            </Button>
+          </Box>
+
+          {statusSaude.value && (
+            <Box sx={{ marginBottom: 2 }}>
+              <Typography
+                variant="body2"
+                color={
+                  statusSaude.value === "ok" ? "success.main" : "error.main"
+                }
+              >
+                {statusSaude.value === "ok"
+                  ? strings.geral.saudeOK
+                  : strings.geral.saudeErro}
+              </Typography>
+            </Box>
+          )}
           <Typography variant="caption" color="textSecondary">
-            Desenvolvido por Matheus Faustino
+            {strings.geral.desenvolvedor}
           </Typography>
         </CardContent>
       </Card>

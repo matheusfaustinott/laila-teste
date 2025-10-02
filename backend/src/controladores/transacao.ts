@@ -18,32 +18,9 @@ import {
   respostaSucesso,
 } from "../utils/respostas";
 
-/**
- * Controlador de Transações
- *
- * Este controlador gerencia todas as operações CRUD relacionadas
- * às transações financeiras do usuário.
- *
- * Princípios aplicados:
- * - Single Responsibility: apenas operações de transação
- * - Data Ownership: usuário só acessa suas próprias transações
- * - Business Logic: cálculos de resumos e estatísticas
- * - Input Validation: validação rigorosa dos dados financeiros
- *
- * Endpoints disponíveis:
- * - GET /transacoes - Lista transações do usuário
- * - GET /transacoes/:id - Busca transação específica
- * - POST /transacoes - Cria nova transação
- * - PUT /transacoes/:id - Atualiza transação
- * - DELETE /transacoes/:id - Remove transação
- * - GET /transacoes/resumo-mensal - Estatísticas mensais
- */
-
-// Repositories para operações com banco de dados
 let repositorioTransacao: Repository<Transacao>;
 let repositorioCategoria: Repository<Categoria>;
 
-// Inicializa os repositórios quando o DataSource estiver pronto
 const inicializarRepositorios = () => {
   if (!repositorioTransacao) {
     repositorioTransacao = AppDataSource.getRepository(Transacao);
@@ -54,17 +31,8 @@ const inicializarRepositorios = () => {
 };
 
 /**
- * Lista todas as transações do usuário autenticado
- *
  * @param req - Request autenticado
  * @param res - Response com lista de transações
- *
- * Query parameters opcionais:
- * - limite: número máximo de resultados
- * - pagina: página atual (para paginação)
- * - tipo: filtro por tipo (receita/despesa)
- * - categoriaId: filtro por categoria
- * - dataInicio/dataFim: filtro por período
  */
 export const listarTransacoes = async (
   req: RequestAutenticado,
@@ -72,22 +40,16 @@ export const listarTransacoes = async (
 ): Promise<void> => {
   try {
     inicializarRepositorios();
-
-    // Verifica se o usuário está autenticado
     if (!req.usuario) {
       respostaNaoAutorizado(res, "Usuário não autenticado");
       return;
     }
-
-    // Parâmetros de consulta
     const limite = parseInt(req.query.limite as string) || 10;
     const pagina = parseInt(req.query.pagina as string) || 1;
     const tipo = req.query.tipo as string;
     const categoriaId = req.query.categoriaId as string;
     const dataInicio = req.query.dataInicio as string;
     const dataFim = req.query.dataFim as string;
-
-    // Validação dos parâmetros
     if (limite < 1 || limite > 100) {
       respostaDadosInvalidos(res, "Limite deve estar entre 1 e 100");
       return;
@@ -102,15 +64,12 @@ export const listarTransacoes = async (
       respostaDadosInvalidos(res, 'Tipo deve ser "receita" ou "despesa"');
       return;
     }
-
-    // Monta query base
     const queryBuilder = repositorioTransacao
       .createQueryBuilder("transacao")
       .leftJoinAndSelect("transacao.categoria", "categoria")
       .where("transacao.usuarioId = :usuarioId", { usuarioId: req.usuario.id })
       .orderBy("transacao.data", "DESC");
 
-    // Adiciona filtros opcionais
     if (tipo) {
       queryBuilder.andWhere("transacao.tipo = :tipo", { tipo });
     }
@@ -128,15 +87,9 @@ export const listarTransacoes = async (
     if (dataFim) {
       queryBuilder.andWhere("transacao.data <= :dataFim", { dataFim });
     }
-
-    // Aplica paginação
     const offset = (pagina - 1) * limite;
     queryBuilder.skip(offset).take(limite);
-
-    // Executa query
     const [transacoes, total] = await queryBuilder.getManyAndCount();
-
-    // Calcula metadados de paginação
     const totalPaginas = Math.ceil(total / limite);
 
     respostaSucesso(res, {
@@ -161,10 +114,9 @@ export const listarTransacoes = async (
 };
 
 /**
- * Busca uma transação específica por ID
  *
- * @param req - Request com ID da transação
- * @param res - Response com dados da transação
+ * @param req
+ * @param res
  */
 export const buscarTransacaoPorId = async (
   req: RequestAutenticado,
@@ -175,13 +127,11 @@ export const buscarTransacaoPorId = async (
 
     const { id } = req.params;
 
-    // Verifica se o usuário está autenticado
     if (!req.usuario) {
       respostaNaoAutorizado(res, "Usuário não autenticado");
       return;
     }
 
-    // Busca a transação garantindo que pertence ao usuário
     const transacao = await repositorioTransacao.findOne({
       where: {
         id,
@@ -206,10 +156,8 @@ export const buscarTransacaoPorId = async (
 };
 
 /**
- * Cria uma nova transação
- *
- * @param req - Request com dados da transação
- * @param res - Response com transação criada
+ * @param req
+ * @param res
  */
 export const criarTransacao = async (
   req: RequestAutenticado,
@@ -217,8 +165,6 @@ export const criarTransacao = async (
 ): Promise<void> => {
   try {
     inicializarRepositorios();
-
-    // Verifica se o usuário está autenticado
     if (!req.usuario) {
       respostaNaoAutorizado(res, "Usuário não autenticado");
       return;
@@ -232,8 +178,6 @@ export const criarTransacao = async (
       data,
       categoriaId,
     }: CriarTransacaoDto = req.body;
-
-    // Validação dos dados
     const errosValidacao = validarDadosTransacao({
       titulo,
       descricao,
@@ -247,8 +191,6 @@ export const criarTransacao = async (
       respostaDadosInvalidos(res, errosValidacao);
       return;
     }
-
-    // Verifica se a categoria existe e pertence ao usuário (se fornecida)
     if (categoriaId) {
       const categoria = await repositorioCategoria.findOne({
         where: {
@@ -262,8 +204,6 @@ export const criarTransacao = async (
         return;
       }
     }
-
-    // Cria nova transação
     const novaTransacao = repositorioTransacao.create({
       titulo: titulo.trim(),
       descricao: descricao?.trim(),
@@ -273,11 +213,7 @@ export const criarTransacao = async (
       usuario: { id: req.usuario.id },
       categoria: categoriaId ? { id: categoriaId } : undefined,
     });
-
-    // Salva no banco
     const transacaoSalva = await repositorioTransacao.save(novaTransacao);
-
-    // Busca a transação completa com relacionamentos
     const transacaoCompleta = await repositorioTransacao.findOne({
       where: { id: transacaoSalva.id },
       relations: ["categoria"],
@@ -292,20 +228,13 @@ export const criarTransacao = async (
       "Transação criada com sucesso"
     );
   } catch (error) {
-    console.error("Erro detalhado ao criar transação:");
-    console.error("Stack trace:", (error as Error).stack);
-    console.error("Message:", (error as Error).message);
-    console.error("Name:", (error as Error).name);
-    console.error("Full error:", error);
     respostaErro(res, "Erro interno do servidor ao criar transação");
   }
 };
 
 /**
- * Atualiza uma transação existente
- *
- * @param req - Request com ID e novos dados da transação
- * @param res - Response com transação atualizada
+ * @param req
+ * @param res
  */
 export const atualizarTransacao = async (
   req: RequestAutenticado,
@@ -315,16 +244,12 @@ export const atualizarTransacao = async (
     inicializarRepositorios();
 
     const { id } = req.params;
-
-    // Verifica se o usuário está autenticado
     if (!req.usuario) {
       respostaNaoAutorizado(res, "Usuário não autenticado");
       return;
     }
 
     const { titulo, descricao, valor, tipo, data, categoriaId } = req.body;
-
-    // Validação dos dados
     const errosValidacao = validarDadosTransacao({
       titulo,
       descricao,
@@ -338,8 +263,6 @@ export const atualizarTransacao = async (
       respostaDadosInvalidos(res, errosValidacao);
       return;
     }
-
-    // Busca a transação garantindo que pertence ao usuário
     const transacao = await repositorioTransacao.findOne({
       where: {
         id,
@@ -351,8 +274,6 @@ export const atualizarTransacao = async (
       respostaNaoEncontrado(res, "Transação não encontrada");
       return;
     }
-
-    // Verifica se a categoria existe e pertence ao usuário (se fornecida)
     if (categoriaId) {
       const categoria = await repositorioCategoria.findOne({
         where: {
@@ -366,8 +287,6 @@ export const atualizarTransacao = async (
         return;
       }
     }
-
-    // Atualiza os dados
     transacao.titulo = titulo.trim();
     transacao.descricao = descricao?.trim();
     transacao.valor = parseFloat(valor.toString());
@@ -376,11 +295,7 @@ export const atualizarTransacao = async (
     transacao.categoria = categoriaId
       ? ({ id: categoriaId } as Categoria)
       : undefined;
-
-    // Salva as alterações
     const transacaoAtualizada = await repositorioTransacao.save(transacao);
-
-    // Busca a transação completa com relacionamentos
     const transacaoCompleta = await repositorioTransacao.findOne({
       where: { id: transacaoAtualizada.id },
       relations: ["categoria"],
@@ -397,10 +312,9 @@ export const atualizarTransacao = async (
 };
 
 /**
- * Remove uma transação
  *
- * @param req - Request com ID da transação
- * @param res - Response confirmando remoção
+ * @param req
+ * @param res
  */
 export const removerTransacao = async (
   req: RequestAutenticado,
@@ -410,14 +324,10 @@ export const removerTransacao = async (
     inicializarRepositorios();
 
     const { id } = req.params;
-
-    // Verifica se o usuário está autenticado
     if (!req.usuario) {
       respostaNaoAutorizado(res, "Usuário não autenticado");
       return;
     }
-
-    // Busca a transação garantindo que pertence ao usuário
     const transacao = await repositorioTransacao.findOne({
       where: {
         id,
@@ -429,8 +339,6 @@ export const removerTransacao = async (
       respostaNaoEncontrado(res, "Transação não encontrada");
       return;
     }
-
-    // Remove a transação
     await repositorioTransacao.remove(transacao);
 
     respostaSemConteudo(res);
@@ -441,10 +349,8 @@ export const removerTransacao = async (
 };
 
 /**
- * Obtém resumo financeiro mensal do usuário
- *
- * @param req - Request com ano e mês opcionais
- * @param res - Response com estatísticas financeiras
+ * @param req
+ * @param res
  */
 export const obterResumoMensal = async (
   req: RequestAutenticado,
@@ -452,18 +358,12 @@ export const obterResumoMensal = async (
 ): Promise<void> => {
   try {
     inicializarRepositorios();
-
-    // Verifica se o usuário está autenticado
     if (!req.usuario) {
       respostaNaoAutorizado(res, "Usuário não autenticado");
       return;
     }
-
-    // Parâmetros de consulta (padrão: mês atual)
     const ano = parseInt(req.query.ano as string) || new Date().getFullYear();
     const mes = parseInt(req.query.mes as string) || new Date().getMonth() + 1;
-
-    // Validação dos parâmetros
     if (ano < 1900 || ano > new Date().getFullYear() + 10) {
       respostaDadosInvalidos(
         res,
@@ -476,15 +376,11 @@ export const obterResumoMensal = async (
       respostaDadosInvalidos(res, "Mês deve estar entre 1 e 12");
       return;
     }
-
-    // Datas de início e fim do mês no formato YYYY-MM-DD
     const dataInicioStr = `${ano}-${mes.toString().padStart(2, "0")}-01`;
     const ultimoDiaDoMes = new Date(ano, mes, 0).getDate();
     const dataFimStr = `${ano}-${mes
       .toString()
       .padStart(2, "0")}-${ultimoDiaDoMes.toString().padStart(2, "0")}`;
-
-    // Busca transações do período usando createQueryBuilder
     const transacoes = await repositorioTransacao
       .createQueryBuilder("transacao")
       .leftJoinAndSelect("transacao.categoria", "categoria")
@@ -494,7 +390,7 @@ export const obterResumoMensal = async (
       .andWhere("transacao.data <= :dataFim", { dataFim: dataFimStr })
       .getMany();
 
-    // Calcula estatísticas
+    // começar a calcular estatísticas
     let totalReceitas = 0;
     let totalDespesas = 0;
     const receitasPorCategoria: { [key: string]: number } = {};
@@ -547,18 +443,12 @@ export const obterResumoMensal = async (
   }
 };
 
-// === FUNÇÕES AUXILIARES ===
-
 /**
- * Valida os dados de uma transação
- *
- * @param dados - Dados da transação para validar
- * @returns Array de erros encontrados
+ * @param dados
+ * @returns
  */
 const validarDadosTransacao = (dados: CriarTransacaoDto): string[] => {
   const erros: string[] = [];
-
-  // Validação do título
   if (!dados.titulo || dados.titulo.trim().length < 3) {
     erros.push("Título deve ter pelo menos 3 caracteres");
   }
@@ -566,13 +456,9 @@ const validarDadosTransacao = (dados: CriarTransacaoDto): string[] => {
   if (dados.titulo && dados.titulo.trim().length > 100) {
     erros.push("Título deve ter no máximo 100 caracteres");
   }
-
-  // Validação da descrição (opcional)
   if (dados.descricao && dados.descricao.trim().length > 500) {
     erros.push("Descrição deve ter no máximo 500 caracteres");
   }
-
-  // Validação do valor
   const valor = parseFloat(dados.valor.toString());
   if (isNaN(valor) || valor <= 0) {
     erros.push("Valor deve ser um número positivo");
@@ -581,16 +467,12 @@ const validarDadosTransacao = (dados: CriarTransacaoDto): string[] => {
   if (valor > 999999.99) {
     erros.push("Valor deve ser menor que R$ 999.999,99");
   }
-
-  // Validação do tipo
   if (
     !dados.tipo ||
-    !["RECEITA", "DESPESA", "receita", "despesa"].includes(dados.tipo)
+    !["RECEITA", "DESPESA", "receita", "despesa"].includes(dados.tipo) // botei em uper e lower pra ter certeza que vai funcionar
   ) {
     erros.push('Tipo deve ser "RECEITA" ou "DESPESA"');
   }
-
-  // Validação da data
   if (!dados.data) {
     erros.push("Data é obrigatória");
   } else {
@@ -598,21 +480,15 @@ const validarDadosTransacao = (dados: CriarTransacaoDto): string[] => {
     if (isNaN(data.getTime())) {
       erros.push("Data deve estar em formato válido");
     }
-
-    // Não permite datas futuras além de 1 ano
     const umAnoNoFuturo = new Date();
     umAnoNoFuturo.setFullYear(umAnoNoFuturo.getFullYear() + 1);
-
     if (data > umAnoNoFuturo) {
       erros.push("Data não pode ser superior a 1 ano no futuro");
     }
-
-    // Não permite datas muito antigas
     const anoMinimo = new Date("1900-01-01");
     if (data < anoMinimo) {
       erros.push("Data não pode ser anterior a 1900");
     }
   }
-
   return erros;
 };

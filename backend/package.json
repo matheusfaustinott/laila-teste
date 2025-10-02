@@ -18,7 +18,6 @@
     "lint": "echo \"ESLint não configurado ainda\" && exit 0"
   },
   "keywords": [
-    "finance",
     "api",
     "typescript",
     "express",
@@ -26,8 +25,8 @@
     "postgresql"
   ],
   "author": "Matheus Faustino",
-  "license": "MIT",
-  "description": "Sistema de Controle Financeiro Pessoal - Backend API",
+  "license": "",
+  "description": "",
   "dependencies": {
     "bcrypt": "^6.0.0",
     "cors": "^2.8.5",

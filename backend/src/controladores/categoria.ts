@@ -14,30 +14,7 @@ import {
   respostaSucesso,
 } from "../utils/respostas";
 
-/**
- * Controlador de Categorias
- *
- * Este controlador gerencia todas as operações CRUD relacionadas
- * às categorias de transações financeiras.
- *
- * Princípios aplicados:
- * - Single Responsibility: apenas operações de categoria
- * - Data Ownership: usuário só acessa suas próprias categorias
- * - Input Validation: validação rigorosa dos dados
- * - Error Handling: tratamento consistente de erros
- *
- * Endpoints disponíveis:
- * - GET /categorias - Lista categorias do usuário
- * - GET /categorias/:id - Busca categoria específica
- * - POST /categorias - Cria nova categoria
- * - PUT /categorias/:id - Atualiza categoria
- * - DELETE /categorias/:id - Remove categoria
- */
-
-// Repository para operações com banco de dados
 let repositorioCategoria: Repository<Categoria>;
-
-// Inicializa o repositório quando o DataSource estiver pronto
 const inicializarRepositorio = () => {
   if (!repositorioCategoria) {
     repositorioCategoria = AppDataSource.getRepository(Categoria);
@@ -45,15 +22,9 @@ const inicializarRepositorio = () => {
 };
 
 /**
- * Lista todas as categorias do usuário autenticado
  *
- * @param req - Request autenticado
- * @param res - Response com lista de categorias
- *
- * Query parameters opcionais:
- * - limite: número máximo de resultados
- * - pagina: página atual (para paginação)
- * - busca: termo para busca por nome
+ * @param req
+ * @param res
  */
 export const listarCategorias = async (
   req: RequestAutenticado,
@@ -61,50 +32,35 @@ export const listarCategorias = async (
 ): Promise<void> => {
   try {
     inicializarRepositorio();
-
-    // Verifica se o usuário está autenticado
     if (!req.usuario) {
       respostaNaoAutorizado(res, "Usuário não autenticado");
       return;
     }
-
-    // Parâmetros de paginação e busca
     const limite = parseInt(req.query.limite as string) || 10;
     const pagina = parseInt(req.query.pagina as string) || 1;
     const busca = req.query.busca as string;
-
-    // Validação dos parâmetros
     if (limite < 1 || limite > 100) {
       respostaDadosInvalidos(res, "Limite deve estar entre 1 e 100");
       return;
     }
-
     if (pagina < 1) {
       respostaDadosInvalidos(res, "Página deve ser maior que 0");
       return;
     }
-
-    // Monta query base
+    // Monta query
     const queryBuilder = repositorioCategoria
       .createQueryBuilder("categoria")
       .where("categoria.usuarioId = :usuarioId", { usuarioId: req.usuario.id })
       .orderBy("categoria.nome", "ASC");
 
-    // Adiciona filtro de busca se fornecido
     if (busca && busca.trim()) {
       queryBuilder.andWhere("categoria.nome ILIKE :busca", {
         busca: `%${busca.trim()}%`,
       });
     }
-
-    // Aplica paginação
     const offset = (pagina - 1) * limite;
     queryBuilder.skip(offset).take(limite);
-
-    // Executa query
     const [categorias, total] = await queryBuilder.getManyAndCount();
-
-    // Calcula metadados de paginação
     const totalPaginas = Math.ceil(total / limite);
     const temProximaPagina = pagina < totalPaginas;
     const temPaginaAnterior = pagina > 1;
@@ -128,10 +84,8 @@ export const listarCategorias = async (
 };
 
 /**
- * Busca uma categoria específica por ID
- *
- * @param req - Request com ID da categoria
- * @param res - Response com dados da categoria
+ * @param req
+ * @param res
  */
 export const buscarCategoriaPorId = async (
   req: RequestAutenticado,
@@ -139,16 +93,11 @@ export const buscarCategoriaPorId = async (
 ): Promise<void> => {
   try {
     inicializarRepositorio();
-
     const { id } = req.params;
-
-    // Verifica se o usuário está autenticado
     if (!req.usuario) {
       respostaNaoAutorizado(res, "Usuário não autenticado");
       return;
     }
-
-    // Busca a categoria garantindo que pertence ao usuário
     const categoria = await repositorioCategoria.findOne({
       where: {
         id,
@@ -173,10 +122,9 @@ export const buscarCategoriaPorId = async (
 };
 
 /**
- * Cria uma nova categoria
  *
- * @param req - Request com dados da categoria
- * @param res - Response com categoria criada
+ * @param req
+ * @param res
  */
 export const criarCategoria = async (
   req: RequestAutenticado,
@@ -184,24 +132,16 @@ export const criarCategoria = async (
 ): Promise<void> => {
   try {
     inicializarRepositorio();
-
-    // Verifica se o usuário está autenticado
     if (!req.usuario) {
       respostaNaoAutorizado(res, "Usuário não autenticado");
       return;
     }
-
     const { nome, descricao }: CriarCategoriaDto = req.body;
-
-    // Validação dos dados
     const errosValidacao = validarDadosCategoria({ nome, descricao });
-
     if (errosValidacao.length > 0) {
       respostaDadosInvalidos(res, errosValidacao);
       return;
     }
-
-    // Verifica se já existe categoria com mesmo nome para o usuário
     const categoriaExistente = await repositorioCategoria.findOne({
       where: {
         nome: nome.trim(),
@@ -217,15 +157,11 @@ export const criarCategoria = async (
       );
       return;
     }
-
-    // Cria nova categoria
     const novaCategoria = repositorioCategoria.create({
       nome: nome.trim(),
       descricao: descricao?.trim(),
       usuario: { id: req.usuario.id },
     });
-
-    // Salva no banco
     const categoriaSalva = await repositorioCategoria.save(novaCategoria);
 
     respostaCriado(
@@ -243,10 +179,9 @@ export const criarCategoria = async (
 };
 
 /**
- * Atualiza uma categoria existente
  *
- * @param req - Request com ID e novos dados da categoria
- * @param res - Response com categoria atualizada
+ * @param req
+ * @param res
  */
 export const atualizarCategoria = async (
   req: RequestAutenticado,
@@ -256,24 +191,18 @@ export const atualizarCategoria = async (
     inicializarRepositorio();
 
     const { id } = req.params;
-
-    // Verifica se o usuário está autenticado
     if (!req.usuario) {
       respostaNaoAutorizado(res, "Usuário não autenticado");
       return;
     }
 
     const { nome, descricao } = req.body;
-
-    // Validação dos dados
     const errosValidacao = validarDadosCategoria({ nome, descricao });
 
     if (errosValidacao.length > 0) {
       respostaDadosInvalidos(res, errosValidacao);
       return;
     }
-
-    // Busca a categoria garantindo que pertence ao usuário
     const categoria = await repositorioCategoria.findOne({
       where: {
         id,
@@ -285,8 +214,6 @@ export const atualizarCategoria = async (
       respostaNaoEncontrado(res, "Categoria não encontrada");
       return;
     }
-
-    // Verifica se não há conflito de nome (exceto com ela mesma)
     if (nome && nome.trim() !== categoria.nome) {
       const categoriaComMesmoNome = await repositorioCategoria.findOne({
         where: {
@@ -294,7 +221,6 @@ export const atualizarCategoria = async (
           usuario: { id: req.usuario.id },
         },
       });
-
       if (categoriaComMesmoNome) {
         respostaConflito(
           res,
@@ -304,12 +230,8 @@ export const atualizarCategoria = async (
         return;
       }
     }
-
-    // Atualiza os dados
     if (nome) categoria.nome = nome.trim();
     if (descricao !== undefined) categoria.descricao = descricao?.trim();
-
-    // Salva as alterações
     const categoriaAtualizada = await repositorioCategoria.save(categoria);
 
     respostaSucesso(res, {
@@ -323,10 +245,9 @@ export const atualizarCategoria = async (
 };
 
 /**
- * Remove uma categoria
  *
- * @param req - Request com ID da categoria
- * @param res - Response confirmando remoção
+ * @param req
+ * @param res
  */
 export const removerCategoria = async (
   req: RequestAutenticado,
@@ -336,14 +257,10 @@ export const removerCategoria = async (
     inicializarRepositorio();
 
     const { id } = req.params;
-
-    // Verifica se o usuário está autenticado
     if (!req.usuario) {
       respostaNaoAutorizado(res, "Usuário não autenticado");
       return;
     }
-
-    // Busca a categoria garantindo que pertence ao usuário
     const categoria = await repositorioCategoria.findOne({
       where: {
         id,
@@ -356,8 +273,6 @@ export const removerCategoria = async (
       respostaNaoEncontrado(res, "Categoria não encontrada");
       return;
     }
-
-    // Verifica se a categoria tem transações associadas
     if (categoria.transacoes && categoria.transacoes.length > 0) {
       respostaDadosInvalidos(
         res,
@@ -365,8 +280,6 @@ export const removerCategoria = async (
       );
       return;
     }
-
-    // Remove a categoria
     await repositorioCategoria.remove(categoria);
 
     respostaSemConteudo(res);
@@ -377,10 +290,9 @@ export const removerCategoria = async (
 };
 
 /**
- * Lista as categorias mais usadas pelo usuário
  *
- * @param req - Request autenticado
- * @param res - Response com categorias e contadores
+ * @param req
+ * @param res
  */
 export const listarCategoriasMaisUsadas = async (
   req: RequestAutenticado,
@@ -388,14 +300,10 @@ export const listarCategoriasMaisUsadas = async (
 ): Promise<void> => {
   try {
     inicializarRepositorio();
-
-    // Verifica se o usuário está autenticado
     if (!req.usuario) {
       respostaNaoAutorizado(res, "Usuário não autenticado");
       return;
     }
-
-    // Query para buscar categorias com contagem de transações
     const categorias = await repositorioCategoria
       .createQueryBuilder("categoria")
       .leftJoin("categoria.transacoes", "transacao")
@@ -429,18 +337,12 @@ export const listarCategoriasMaisUsadas = async (
   }
 };
 
-// === FUNÇÕES AUXILIARES ===
-
 /**
- * Valida os dados de uma categoria
- *
- * @param dados - Dados da categoria para validar
- * @returns Array de erros encontrados
+ * @param dados
+ * @returns
  */
 const validarDadosCategoria = (dados: CriarCategoriaDto): string[] => {
   const erros: string[] = [];
-
-  // Validação do nome
   if (!dados.nome || dados.nome.trim().length < 2) {
     erros.push("Nome da categoria deve ter pelo menos 2 caracteres");
   }
@@ -448,8 +350,6 @@ const validarDadosCategoria = (dados: CriarCategoriaDto): string[] => {
   if (dados.nome && dados.nome.trim().length > 50) {
     erros.push("Nome da categoria deve ter no máximo 50 caracteres");
   }
-
-  // Validação da descrição (opcional)
   if (dados.descricao && dados.descricao.trim().length > 200) {
     erros.push("Descrição deve ter no máximo 200 caracteres");
   }

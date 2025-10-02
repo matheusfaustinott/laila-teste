@@ -2,7 +2,7 @@
 
 Desenvolvi esse projeto para demonstrar conhecimentos em **Node.js, TypeScript, Express e PostgreSQL**.
 
-É um sistema completo de controle financeiro pessoal solicitado como teste técnico, aplicando boas práticas e arquitetura MVC limpa.
+É um sistema completo de controle financeiro pessoal solicitado como teste técnico.
 
 ## O que eu implementei
 
@@ -16,23 +16,13 @@ Desenvolvi esse projeto para demonstrar conhecimentos em **Node.js, TypeScript, 
 - **TypeScript** - tipagem forte em todo o projeto
 - **Docker setup** - containerização do PostgreSQL
 
-## Stack tecnológica escolhida
-
-### Core
-
-- **Node.js v18+** - Runtime que escolhi pela maturidade e ecossistema
-- **TypeScript** - Porque tem tipagem estática
-- **Express.js** - Framework minimalista e flexível que domino
-- **TypeORM** - ORM que facilita muito o trabalho com PostgreSQL porem é algo novo pra mim no momento.
-- **PostgreSQL** - Banco robusto para dados relacionais
-
 ### Bibliotecas essenciais
 
-- `jsonwebtoken` - Para autenticação JWT stateless
-- `bcrypt` - Hash seguro de senhas
-- `http-status-codes` - Para responses HTTP semânticos
-- `cors` - Configuração de CORS para frontend
-- `dotenv` - Gerenciamento de variáveis de ambiente
+- `jsonwebtoken` - Para autenticação JWT
+- `bcrypt` - Hash
+- `http-status-codes` - Para responses HTTP
+- `cors` - Configuração de CORS
+- `dotenv` - Gerenciamento
 - `jest + supertest` - Setup de testes que aprendi a configurar, não possuo muita experiencia foi mais um estudo
 
 ## Referências para o desenvolvimento
@@ -78,7 +68,7 @@ DB_PASSWORD=admin
 DB_DATABASE=laila
 
 # JWT
-JWT_SECRET= sabe_o+que_fazer
+JWT_SECRET= 8f3e9d2a7b5c1e4f6a9b8c0d3e2f1a4b7c6d9e8f0a1b2c5d4e3f6a7b8c9d0e1f2
 JWT_EXPIRATION=24h
 
 # Server
@@ -122,8 +112,6 @@ npm run test:watch # Modo watch para desenvolvimento
 ### O que testei:
 
 - **Endpoints da API** - Registro, login, transações
-
-Os testes são implementados com **Jest + Supertest** e cobrem os cenários principais da API de forma simples e direta.
 
 ## API
 
@@ -323,18 +311,6 @@ npm run test:watch     # Modo watch para desenvolvimento
 - **CORS configurado** adequadamente
 - **Middleware de auth** protegendo rotas sensíveis
 - **Graceful shutdown** para deploys sem downtime
-
-## Testes Básicos
-
-Implementei um setup simples:
-
-- **Health check** da aplicação
-- **Endpoints de auth** (registro/login)
-- **Endpoints de transações** (CRUD básico)
-- **Validações** de email e senha
-- **Casos de erro** (dados inválidos, não autorizado)
-
-Comando `npm test` para rodar os testes.
 
 ## Decisões técnicas que tomei
 

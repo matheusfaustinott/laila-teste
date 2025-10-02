@@ -1,4 +1,3 @@
-// Arquivo central para exportar utilitários de request
 export {
   buildQueryParams,
   buildUrl,

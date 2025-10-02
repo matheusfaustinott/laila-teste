@@ -1,16 +1,13 @@
 import { signal } from "@preact/signals-react";
 import strings from "../strings";
 
-// Estado para modal de erro
 export const modalErro = signal({
   aberto: false,
   titulo: "",
   mensagem: "",
-  tipo: "error", // error, warning, info, success
+  tipo: "error",
   aoFechar: null,
 });
-
-// Estado para modal de confirmação
 export const modalConfirmacao = signal({
   aberto: false,
   titulo: "",
@@ -19,16 +16,13 @@ export const modalConfirmacao = signal({
   aoCancel: null,
   textoConfirmar: "Confirmar",
   textoCancelar: "Cancelar",
-  tipoConfirmar: "primary", // primary, secondary, error, warning
+  tipoConfirmar: "primary",
 });
-
-// Estado para modal de carregamento
 export const modalCarregamento = signal({
   aberto: false,
   mensagem: strings.geral.carregando,
 });
 
-// Estado para modal de erro de credenciais (login específico)
 export const modalErroCredenciais = signal({
   aberto: false,
   aoIrParaCadastro: null,
@@ -36,11 +30,11 @@ export const modalErroCredenciais = signal({
 });
 
 /**
- * Função para mostrar modal de erro
- * @param {string} titulo - Título do modal
- * @param {string} mensagem - Mensagem de erro
- * @param {string} tipo - Tipo do erro (error, warning, info, success)
- * @param {Function} aoFechar - Callback ao fechar
+ *
+ * @param {string} titulo
+ * @param {string} mensagem
+ * @param {string} tipo
+ * @param {Function} aoFechar
  */
 export const mostrarModalErro = (
   titulo,
@@ -127,9 +121,6 @@ export const mostrarModalCarregamento = (
   };
 };
 
-/**
- * Função para fechar modal de carregamento
- */
 export const fecharModalCarregamento = () => {
   modalCarregamento.value = {
     aberto: false,
@@ -138,9 +129,8 @@ export const fecharModalCarregamento = () => {
 };
 
 /**
- * Função para mostrar modal de erro de credenciais
- * @param {Function} aoIrParaCadastro - Callback para ir para cadastro
- * @param {Function} aoFechar - Callback ao fechar
+ * @param {Function} aoIrParaCadastro
+ * @param {Function} aoFechar
  */
 export const mostrarModalErroCredenciais = (
   aoIrParaCadastro = null,
@@ -153,9 +143,6 @@ export const mostrarModalErroCredenciais = (
   };
 };
 
-/**
- * Função para fechar modal de erro de credenciais
- */
 export const fecharModalErroCredenciais = () => {
   if (modalErroCredenciais.value.aoFechar) {
     modalErroCredenciais.value.aoFechar();
@@ -167,9 +154,6 @@ export const fecharModalErroCredenciais = () => {
   };
 };
 
-/**
- * Função para ir para cadastro a partir do modal de erro de credenciais
- */
 export const irParaCadastroDoModal = () => {
   if (modalErroCredenciais.value.aoIrParaCadastro) {
     modalErroCredenciais.value.aoIrParaCadastro();

@@ -1,8 +1,6 @@
-// Configurações globais da aplicação
 export const config = {
   // URLs da API
   API_BASE_URL: "http://localhost:3001/api",
-
   // URLs específicas
   API_ENDPOINTS: {
     AUTH: {
@@ -17,6 +15,7 @@ export const config = {
       CREATE: "/transacoes",
       UPDATE: "/transacoes",
       DELETE: "/transacoes",
+      RESUMO_MENSAL: "/transacoes/resumo/mensal",
     },
     CATEGORIES: {
       LIST: "/categorias",
@@ -25,17 +24,15 @@ export const config = {
       DELETE: "/categorias",
     },
   },
-
-  // Configurações de timeout
   REQUEST_TIMEOUT: 10000,
 
-  // Configurações de paginação
+  //paginação
   PAGINATION: {
     DEFAULT_PAGE_SIZE: 10,
     MAX_PAGE_SIZE: 100,
   },
 
-  // Configurações de validação
+  //validação
   VALIDATION: {
     MIN_PASSWORD_LENGTH: 6,
     MAX_PASSWORD_LENGTH: 100,
@@ -43,7 +40,7 @@ export const config = {
     MAX_NAME_LENGTH: 100,
   },
 
-  // Configurações de tema
+  //tema
   THEME: {
     PRIMARY_COLOR: "rgba(76, 3, 107, 1)",
     SECONDARY_COLOR: "rgba(151, 65, 189, 1)",
@@ -52,7 +49,7 @@ export const config = {
     WARNING_COLOR: "#ff9800",
   },
 
-  // Configurações de storage
+  //storage
   STORAGE_KEYS: {
     TOKEN: "token",
     USER: "usuario",

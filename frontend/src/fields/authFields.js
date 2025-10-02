@@ -1,4 +1,3 @@
-// Campos de autenticação
 import { stringsAutenticacao } from "../strings/authStrings";
 
 export const authFields = {

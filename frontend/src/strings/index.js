@@ -1,20 +1,20 @@
-// Arquivo central para exportar todas as strings
 import { stringsAutenticacao } from "./authStrings";
-import { stringsCategorias } from "./categoryStrings";
-import { stringsGerais } from "./generalStrings";
+import { stringsCategorias } from "./categoriaStrings";
+import { stringsGerais } from "./geralStrings";
+import { stringsResumo } from "./resumoStrings";
 import { stringsTransacoes } from "./transactionStrings";
 
 export { stringsAutenticacao } from "./authStrings";
-export { stringsCategorias } from "./categoryStrings";
-export { stringsGerais } from "./generalStrings";
+export { stringsCategorias } from "./categoriaStrings";
+export { stringsGerais } from "./geralStrings";
+export { stringsResumo } from "./resumoStrings";
 export { stringsTransacoes } from "./transactionStrings";
-
-// Objeto central com todas as strings - facilita o acesso como strings.autenticacao.tituloLogin
 export const strings = {
   autenticacao: stringsAutenticacao,
   geral: stringsGerais,
   transacoes: stringsTransacoes,
   categorias: stringsCategorias,
+  resumo: stringsResumo,
 };
 
 export default strings;

@@ -29,7 +29,6 @@ import strings from "../strings";
 const ModaisGlobais = () => {
   useSignals();
 
-  // Função para obter ícone baseado no tipo
   const obterIconePorTipo = (tipo) => {
     switch (tipo) {
       case "error":
@@ -43,8 +42,6 @@ const ModaisGlobais = () => {
         return <Info color="info" />;
     }
   };
-
-  // Função para obter severidade do Alert
   const obterTipoErro = (tipo) => {
     switch (tipo) {
       case "error":
@@ -61,7 +58,6 @@ const ModaisGlobais = () => {
 
   return (
     <>
-      {/* Modal de Erro */}
       <Dialog
         open={modalErro.value.aberto}
         onClose={fecharModalErro}
@@ -118,8 +114,6 @@ const ModaisGlobais = () => {
           </Button>
         </DialogActions>
       </Dialog>
-
-      {/* Modal de Confirmação */}
       <Dialog
         open={modalConfirmacao.value.aberto}
         onClose={cancelarAcao}
@@ -169,8 +163,6 @@ const ModaisGlobais = () => {
           </Button>
         </DialogActions>
       </Dialog>
-
-      {/* Modal de Carregamento */}
       <Backdrop
         open={modalCarregamento.value.aberto}
         sx={{
@@ -200,8 +192,6 @@ const ModaisGlobais = () => {
           )}
         </Box>
       </Backdrop>
-
-      {/* Modal de Erro de Credenciais */}
       <Dialog
         open={modalErroCredenciais.value.aberto}
         onClose={fecharModalErroCredenciais}

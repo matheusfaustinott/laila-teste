@@ -1,7 +1,6 @@
 version: "3.8"
 
 services:
-  # Banco de dados PostgreSQL
   db:
     image: postgres:15-alpine
     container_name: laila_db
@@ -21,8 +20,6 @@ services:
       retries: 5
     networks:
       - laila_network
-
-  # Backend API
   backend:
     build:
       context: ./backend
@@ -45,8 +42,6 @@ services:
         condition: service_healthy
     networks:
       - laila_network
-
-  # Frontend React
   frontend:
     build:
       context: ./frontend

@@ -1,4 +1,3 @@
-// Campos de transações
 import { stringsTransacoes } from "../strings/transactionStrings";
 
 export const transactionFields = {
@@ -52,9 +51,7 @@ export const transactionFields = {
     label: stringsTransacoes.categoria,
     type: "select",
     required: false,
-    validation: {
-      // Categoria agora é opcional
-    },
+    validation: {},
     placeholder: stringsTransacoes.placeholderCategoria,
   },
 

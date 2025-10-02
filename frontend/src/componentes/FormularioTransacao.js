@@ -43,7 +43,6 @@ const FormularioTransacao = ({ onSucesso }) => {
   useEffect(() => {
     if (mostrandoFormularioTransacao.value) {
       if (modoEdicao.value && transacaoAtual.value) {
-        // Carrega dados para edição
         const transacao = transacaoAtual.value;
         setValue("titulo", transacao.titulo);
         setValue("valor", transacao.valor);
@@ -52,9 +51,7 @@ const FormularioTransacao = ({ onSucesso }) => {
         setValue("data", transacao.data?.split("T")[0] || ""); // Formata para input date
         setValue("observacoes", transacao.observacoes || "");
       } else {
-        // Limpa formulário para criação
         reset();
-        // Define data padrão como hoje
         const hoje = new Date().toISOString().split("T")[0];
         setValue("data", hoje);
       }
@@ -73,7 +70,6 @@ const FormularioTransacao = ({ onSucesso }) => {
   };
 
   const onSubmit = (dados) => {
-    // Converte o valor para número
     const dadosFormatados = {
       ...dados,
       valor: parseFloat(dados.valor),
@@ -89,14 +85,12 @@ const FormularioTransacao = ({ onSucesso }) => {
     };
 
     if (modoEdicao.value && transacaoAtual.value) {
-      // Atualizar transação existente
       transacoesAPI.atualizar(
         transacaoAtual.value.id,
         dadosFormatados,
         callbackSucesso
       );
     } else {
-      // Criar nova transação
       transacoesAPI.criar(dadosFormatados, callbackSucesso);
     }
   };
@@ -121,7 +115,6 @@ const FormularioTransacao = ({ onSucesso }) => {
 
         <DialogContent sx={{ paddingTop: 2 }}>
           <Box sx={{ display: "flex", flexDirection: "column", gap: 3 }}>
-            {/* Título */}
             <TextField
               fullWidth
               label={transactionFields.titulo.label}
@@ -130,8 +123,6 @@ const FormularioTransacao = ({ onSucesso }) => {
               helperText={errors.titulo?.message}
               {...register("titulo", transactionFields.titulo.validation)}
             />
-
-            {/* Valor */}
             <TextField
               fullWidth
               type="number"
@@ -145,8 +136,6 @@ const FormularioTransacao = ({ onSucesso }) => {
               helperText={errors.valor?.message}
               {...register("valor", transactionFields.valor.validation)}
             />
-
-            {/* Tipo */}
             <FormControl fullWidth error={!!errors.tipo}>
               <InputLabel>{transactionFields.tipo.label}</InputLabel>
               <Select
@@ -164,8 +153,6 @@ const FormularioTransacao = ({ onSucesso }) => {
                 <FormHelperText>{errors.tipo.message}</FormHelperText>
               )}
             </FormControl>
-
-            {/* Categoria */}
             <FormControl fullWidth error={!!errors.categoriaId}>
               <InputLabel>{transactionFields.categoria.label}</InputLabel>
               <Select
@@ -176,9 +163,6 @@ const FormularioTransacao = ({ onSucesso }) => {
                 )}
                 defaultValue=""
               >
-                <MenuItem value="">
-                  <em>Nenhuma categoria</em>
-                </MenuItem>
                 {categorias.value.map((categoria) => (
                   <MenuItem key={categoria.id} value={categoria.id}>
                     {categoria.nome}
@@ -189,8 +173,6 @@ const FormularioTransacao = ({ onSucesso }) => {
                 <FormHelperText>{errors.categoriaId.message}</FormHelperText>
               )}
             </FormControl>
-
-            {/* Data */}
             <TextField
               fullWidth
               type="date"
@@ -200,8 +182,6 @@ const FormularioTransacao = ({ onSucesso }) => {
               InputLabelProps={{ shrink: true }}
               {...register("data", transactionFields.data.validation)}
             />
-
-            {/* Observações */}
             <TextField
               fullWidth
               multiline
@@ -217,7 +197,6 @@ const FormularioTransacao = ({ onSucesso }) => {
             />
           </Box>
         </DialogContent>
-
         <DialogActions sx={{ padding: 3 }}>
           <Button onClick={handleFechar} color="inherit">
             {strings.geral.cancelar}

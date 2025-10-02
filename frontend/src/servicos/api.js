@@ -67,9 +67,7 @@ const tratarErro = (error, callbackErro = null) => {
   }
 };
 
-// Serviços de autenticação
 export const autenticacaoAPI = {
-  // Fazer login
   login: (email, senha, callbackSucesso = null, callbackErro = null) => {
     mostrarModalCarregamento(strings.autenticacao.carregandoLogin);
 
@@ -97,7 +95,6 @@ export const autenticacaoAPI = {
       });
   },
 
-  // Fazer cadastro
   cadastro: (
     nomeCompleto,
     email,
@@ -133,7 +130,6 @@ export const autenticacaoAPI = {
       });
   },
 
-  // Buscar perfil do usuário
   buscarPerfil: (callbackSucesso = null, callbackErro = null) => {
     mostrarModalCarregamento("Carregando perfil...");
 
@@ -155,7 +151,6 @@ export const autenticacaoAPI = {
       });
   },
 
-  // Fazer logout
   logout: (callbackSucesso = null, callbackErro = null) => {
     mostrarModalCarregamento(strings.autenticacao.carregandoLogout);
 
@@ -174,7 +169,6 @@ export const autenticacaoAPI = {
       })
       .catch((error) => {
         console.warn("Erro ao fazer logout no servidor:", error);
-        // Não mostra erro para o usuário, pois logout deve sempre funcionar
         if (callbackSucesso) {
           callbackSucesso();
         }
@@ -185,9 +179,7 @@ export const autenticacaoAPI = {
   },
 };
 
-// Serviços de transações
 export const transacoesAPI = {
-  // Listar transações
   listar: (params = {}, callbackSucesso = null, callbackErro = null) => {
     mostrarModalCarregamento(strings.transacoes.carregandoTransacoes);
 
@@ -216,7 +208,6 @@ export const transacoesAPI = {
       });
   },
 
-  // Criar transação
   criar: (dadosTransacao, callbackSucesso = null, callbackErro = null) => {
     mostrarModalCarregamento(strings.transacoes.salvandoTransacao);
 
@@ -240,7 +231,6 @@ export const transacoesAPI = {
       });
   },
 
-  // Atualizar transação
   atualizar: (
     id,
     dadosTransacao,
@@ -269,7 +259,6 @@ export const transacoesAPI = {
       });
   },
 
-  // Excluir transação
   excluir: (id, callbackSucesso = null, callbackErro = null) => {
     mostrarModalCarregamento(strings.transacoes.excluindoTransacao);
 
@@ -292,15 +281,17 @@ export const transacoesAPI = {
       });
   },
 
-  // Obter resumo mensal
   resumoMensal: (ano, mes, callbackSucesso = null, callbackErro = null) => {
     mostrarModalCarregamento("Carregando resumo mensal...");
 
     axios
-      .get(`${config.API_BASE_URL}/transacoes/resumo/mensal`, {
-        params: { ano, mes },
-        ...getRequestConfig(),
-      })
+      .get(
+        `${config.API_BASE_URL}${config.API_ENDPOINTS.TRANSACTIONS.RESUMO_MENSAL}`,
+        {
+          params: { ano, mes },
+          ...getRequestConfig(),
+        }
+      )
       .then((response) => {
         const dados = response.data.dados;
         if (callbackSucesso) {
@@ -316,13 +307,9 @@ export const transacoesAPI = {
   },
 };
 
-// Serviços de categorias
 export const categoriasAPI = {
-  // Listar categorias
   listar: (params = {}, callbackSucesso = null, callbackErro = null) => {
-    mostrarModalCarregamento(
-      strings.categorias.carregandoCategorias || "Carregando categorias..."
-    );
+    mostrarModalCarregamento(strings.categorias.carregandoCategorias);
 
     axios
       .get(`${config.API_BASE_URL}${config.API_ENDPOINTS.CATEGORIES.LIST}`, {
@@ -348,12 +335,8 @@ export const categoriasAPI = {
         fecharModalCarregamento();
       });
   },
-
-  // Criar categoria
   criar: (dadosCategoria, callbackSucesso = null, callbackErro = null) => {
-    mostrarModalCarregamento(
-      strings.categorias.salvandoCategoria || "Salvando categoria..."
-    );
+    mostrarModalCarregamento(strings.categorias.salvandoCategoria);
 
     axios
       .post(
@@ -375,16 +358,13 @@ export const categoriasAPI = {
       });
   },
 
-  // Atualizar categoria
   atualizar: (
     id,
     dadosCategoria,
     callbackSucesso = null,
     callbackErro = null
   ) => {
-    mostrarModalCarregamento(
-      strings.categorias.salvandoCategoria || "Salvando categoria..."
-    );
+    mostrarModalCarregamento(strings.categorias.salvandoCategoria);
 
     axios
       .put(
@@ -406,11 +386,8 @@ export const categoriasAPI = {
       });
   },
 
-  // Excluir categoria
   excluir: (id, callbackSucesso = null, callbackErro = null) => {
-    mostrarModalCarregamento(
-      strings.categorias.excluindoCategoria || "Excluindo categoria..."
-    );
+    mostrarModalCarregamento(strings.categorias.excluindoCategoria);
 
     axios
       .delete(

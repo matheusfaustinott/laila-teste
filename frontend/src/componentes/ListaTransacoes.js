@@ -15,20 +15,10 @@ import { mostrarModalConfirmacao } from "../estado/modais";
 import { abrirFormularioTransacao } from "../estado/transacoes";
 import { transacoesAPI } from "../servicos/api";
 import strings from "../strings";
+import { formatarData, formatarMoeda } from "../utils/formatadores";
 
 const ListaTransacoes = ({ transacoes, onAtualizar }) => {
   useSignals();
-
-  const formatarMoeda = (valor) => {
-    return new Intl.NumberFormat("pt-BR", {
-      style: "currency",
-      currency: "BRL",
-    }).format(valor);
-  };
-
-  const formatarData = (data) => {
-    return new Date(data).toLocaleDateString("pt-BR");
-  };
 
   const handleEditar = (transacao) => {
     abrirFormularioTransacao(transacao);
@@ -39,7 +29,6 @@ const ListaTransacoes = ({ transacoes, onAtualizar }) => {
       strings.geral.confirmarExclusao,
       `${strings.transacoes.confirmarExclusaoTransacao} "${transacao.titulo}"?`,
       () => {
-        // Callback de confirmação
         const callbackSucesso = () => {
           if (onAtualizar) {
             onAtualizar();
@@ -48,7 +37,7 @@ const ListaTransacoes = ({ transacoes, onAtualizar }) => {
 
         transacoesAPI.excluir(transacao.id, callbackSucesso);
       },
-      null, // Callback de cancelamento (padrão)
+      null,
       {
         textoConfirmar: strings.geral.excluir,
         textoCancelar: strings.geral.cancelar,
@@ -72,13 +61,12 @@ const ListaTransacoes = ({ transacoes, onAtualizar }) => {
       <Card>
         <CardContent sx={{ textAlign: "center", padding: 4 }}>
           <Typography variant="h6" color="textSecondary" gutterBottom>
-            {strings.transacoes.nenhumaTransacaoEncontrada ||
-              "Nenhuma transação encontrada"}
+            {strings.transacoes.nenhumaTransacaoEncontrada}
           </Typography>
           <Typography variant="body2" color="textSecondary">
             {transacoes === null
               ? strings.transacoes.carregandoTransacoes
-              : "Adicione sua primeira transação ou ajuste os filtros"}
+              : strings.transacoes.adicionePrimeiraTransacao}
           </Typography>
         </CardContent>
       </Card>
@@ -106,7 +94,6 @@ const ListaTransacoes = ({ transacoes, onAtualizar }) => {
                   gap: 2,
                 }}
               >
-                {/* Ícone do tipo */}
                 <Avatar
                   sx={{
                     bgcolor: `${getCorTipo(transacao.tipo)}.main`,
@@ -116,8 +103,6 @@ const ListaTransacoes = ({ transacoes, onAtualizar }) => {
                 >
                   {getIconeTipo(transacao.tipo)}
                 </Avatar>
-
-                {/* Informações principais */}
                 <Box sx={{ flex: 1 }}>
                   <Typography variant="h6" noWrap>
                     {transacao.titulo}
@@ -157,8 +142,6 @@ const ListaTransacoes = ({ transacoes, onAtualizar }) => {
                     </Typography>
                   )}
                 </Box>
-
-                {/* Valor */}
                 <Box sx={{ textAlign: "right", minWidth: 120 }}>
                   <Typography
                     variant="h6"
@@ -179,8 +162,6 @@ const ListaTransacoes = ({ transacoes, onAtualizar }) => {
                     variant="outlined"
                   />
                 </Box>
-
-                {/* Ações */}
                 <Box
                   sx={{ display: "flex", flexDirection: "column", gap: 0.5 }}
                 >

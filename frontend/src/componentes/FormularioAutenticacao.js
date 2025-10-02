@@ -28,20 +28,16 @@ import strings from "../strings";
 
 const FormularioAutenticacao = () => {
   useSignals();
-
   const {
     register,
     handleSubmit,
     formState: { errors },
     reset,
   } = useForm();
-
-  // Função para lidar com o envio do formulário
   const aoEnviar = async (dados) => {
     limparErro();
 
     const callbackSucesso = (resposta) => {
-      // Fazer login com os dados retornados
       if (resposta.sucesso && resposta.dados) {
         fazerLogin(resposta.dados.usuario, resposta.dados.token);
         reset();
@@ -49,12 +45,10 @@ const FormularioAutenticacao = () => {
     };
 
     const callbackErro = (mensagem) => {
-      // Se for erro de login e a mensagem indicar credenciais inválidas,
-      // mostra o modal específico de erro de credenciais
+      // pior solução possivel possivel porem mais rapido de implementar
       if (
         mostrandoLogin.value &&
         (mensagem.toLowerCase().includes("incorret") ||
-          mensagem.toLowerCase().includes("inválid") ||
           mensagem.toLowerCase().includes("invalid") ||
           mensagem.toLowerCase().includes("credenciais") ||
           mensagem.toLowerCase().includes("senha incorret") ||
@@ -62,24 +56,20 @@ const FormularioAutenticacao = () => {
       ) {
         mostrarModalErroCredenciais(
           () => {
-            // Ao clicar em "Cadastrar Agora", alterna para o modo de cadastro
             limparErro();
             reset();
             alternarModo();
           },
           () => {
-            // Ao fechar o modal, não fazer nada especial
             limparErro();
           }
         );
       } else {
-        // Para outros erros, usar o sistema normal
         definirErro(mensagem);
       }
     };
 
     if (mostrandoLogin.value) {
-      // Fazer login
       autenticacaoAPI.login(
         dados.email,
         dados.senha,
@@ -87,7 +77,6 @@ const FormularioAutenticacao = () => {
         callbackErro
       );
     } else {
-      // Fazer cadastro
       autenticacaoAPI.cadastro(
         dados.nomeCompleto,
         dados.email,
@@ -98,7 +87,6 @@ const FormularioAutenticacao = () => {
     }
   };
 
-  // Função para alternar entre login e cadastro
   const trocarModo = () => {
     reset();
     alternarModo();
@@ -118,7 +106,6 @@ const FormularioAutenticacao = () => {
     >
       <Card sx={{ width: "100%", maxWidth: 400 }}>
         <CardContent sx={{ padding: 4 }}>
-          {/* Cabeçalho */}
           <Box sx={{ textAlign: "center", marginBottom: 3 }}>
             {mostrandoLogin.value ? (
               <Login sx={{ fontSize: 48, color: "primary.main", mb: 1 }} />
@@ -136,17 +123,12 @@ const FormularioAutenticacao = () => {
                 : strings.autenticacao.descricaoCadastro}
             </Typography>
           </Box>
-
-          {/* Mensagem de erro */}
           {erro.value && (
             <Alert severity="error" sx={{ marginBottom: 2 }}>
               {erro.value}
             </Alert>
           )}
-
-          {/* Formulário */}
           <Box component="form" onSubmit={handleSubmit(aoEnviar)}>
-            {/* Campo Nome Completo (apenas no cadastro) */}
             {!mostrandoLogin.value && (
               <TextField
                 fullWidth
@@ -164,8 +146,6 @@ const FormularioAutenticacao = () => {
                 disabled={carregando.value}
               />
             )}
-
-            {/* Campo Email */}
             <TextField
               fullWidth
               label={authFields.email.label}
@@ -178,8 +158,6 @@ const FormularioAutenticacao = () => {
               helperText={errors.email?.message}
               disabled={carregando.value}
             />
-
-            {/* Campo Senha */}
             <TextField
               fullWidth
               label={authFields.senha.label}
@@ -192,8 +170,6 @@ const FormularioAutenticacao = () => {
               helperText={errors.senha?.message}
               disabled={carregando.value}
             />
-
-            {/* Botão de envio */}
             <Button
               type="submit"
               fullWidth
@@ -217,8 +193,6 @@ const FormularioAutenticacao = () => {
                 </>
               )}
             </Button>
-
-            {/* Link para alternar modo */}
             <Box sx={{ textAlign: "center" }}>
               <Typography variant="body2" color="textSecondary">
                 {mostrandoLogin.value

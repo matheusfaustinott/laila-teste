@@ -2,11 +2,10 @@ import axios from "axios";
 import { buildUrl, getHeaders } from "./headers";
 
 /**
- * Função para fazer requisições GET
- * @param {string} endpoint - Endpoint da API
- * @param {Object} params - Parâmetros da query
- * @param {Function} callbackSucesso - Callback de sucesso
- * @param {Function} callbackErro - Callback de erro
+ * @param {string} endpoint
+ * @param {Object} params
+ * @param {Function} callbackSucesso
+ * @param {Function} callbackErro
  */
 export const fazerReqGet = (
   endpoint,
@@ -32,11 +31,10 @@ export const fazerReqGet = (
 };
 
 /**
- * Função para fazer requisições POST
- * @param {string} endpoint - Endpoint da API
- * @param {Object} data - Dados do body
- * @param {Function} callbackSucesso - Callback de sucesso
- * @param {Function} callbackErro - Callback de erro
+ * @param {string} endpoint
+ * @param {Object} data
+ * @param {Function} callbackSucesso
+ * @param {Function} callbackErro
  */
 export const fazerReqPost = (
   endpoint,
@@ -61,11 +59,10 @@ export const fazerReqPost = (
 };
 
 /**
- * Função para fazer requisições PUT
- * @param {string} endpoint - Endpoint da API
- * @param {Object} data - Dados do body
- * @param {Function} callbackSucesso - Callback de sucesso
- * @param {Function} callbackErro - Callback de erro
+ * @param {string} endpoint
+ * @param {Object} data
+ * @param {Function} callbackSucesso
+ * @param {Function} callbackErro
  */
 export const fazerReqPut = (
   endpoint,
@@ -90,10 +87,9 @@ export const fazerReqPut = (
 };
 
 /**
- * Função para fazer requisições DELETE
- * @param {string} endpoint - Endpoint da API
- * @param {Function} callbackSucesso - Callback de sucesso
- * @param {Function} callbackErro - Callback de erro
+ * @param {string} endpoint
+ * @param {Function} callbackSucesso
+ * @param {Function} callbackErro
  */
 export const fazerReqDelete = (
   endpoint,

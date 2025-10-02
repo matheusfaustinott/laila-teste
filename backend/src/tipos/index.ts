@@ -66,8 +66,6 @@ export interface ResumoMensalDto {
     categoria: string | null;
   }>;
 }
-
-// Adicionamos o usuário ao Request para usar nos middlewares
 export interface RequestAutenticado extends Request {
   usuario?: Omit<Usuario, "senha">;
   tokenPayload?: TokenPayload;

@@ -39,13 +39,12 @@ import {
 } from "../estado/transacoes";
 import { categoriasAPI, transacoesAPI } from "../servicos/api";
 import strings from "../strings";
+import { formatarMoeda } from "../utils/formatadores";
 import FormularioTransacao from "./FormularioTransacao";
 import ListaTransacoes from "./ListaTransacoes";
 
 const GerenciadorTransacoes = () => {
   useSignals();
-
-  // Carrega dados iniciais
   useEffect(() => {
     carregarTransacoes();
     carregarCategorias();
@@ -75,13 +74,6 @@ const GerenciadorTransacoes = () => {
     );
   };
 
-  const formatarMoeda = (valor) => {
-    return new Intl.NumberFormat("pt-BR", {
-      style: "currency",
-      currency: "BRL",
-    }).format(valor);
-  };
-
   const handleFiltroTipo = (event) => {
     filtrosTipo.value = event.target.value;
   };
@@ -106,7 +98,6 @@ const GerenciadorTransacoes = () => {
       }}
     >
       <Box sx={{ maxWidth: 1200, margin: "0 auto" }}>
-        {/* Header com navegação */}
         <Box
           sx={{
             display: "flex",
@@ -143,11 +134,8 @@ const GerenciadorTransacoes = () => {
             {strings.transacoes.adicionarTransacao}
           </Button>
         </Box>
-
-        {/* Conteúdo principal */}
         <Card sx={{ marginBottom: 3 }}>
           <CardContent sx={{ padding: 3 }}>
-            {/* Cards de Estatísticas */}
             <Grid container spacing={3} sx={{ marginBottom: 3 }}>
               <Grid item xs={12} md={3}>
                 <Card variant="outlined">
@@ -233,8 +221,6 @@ const GerenciadorTransacoes = () => {
                 </Card>
               </Grid>
             </Grid>
-
-            {/* Filtros */}
             <Card variant="outlined" sx={{ marginBottom: 3 }}>
               <CardContent>
                 <Box
@@ -309,8 +295,6 @@ const GerenciadorTransacoes = () => {
                     {strings.transacoes.limparFiltros}
                   </Button>
                 </Box>
-
-                {/* Chips dos filtros ativos */}
                 <Box
                   sx={{
                     display: "flex",
@@ -350,19 +334,13 @@ const GerenciadorTransacoes = () => {
                 </Box>
               </CardContent>
             </Card>
-
-            {/* Lista de Transações */}
             <ListaTransacoes
               transacoes={transacoesFiltradas.value}
               onAtualizar={carregarTransacoes}
             />
           </CardContent>
         </Card>
-
-        {/* Formulário Modal */}
         <FormularioTransacao onSucesso={carregarTransacoes} />
-
-        {/* FAB para adicionar transação */}
         <Fab
           color="primary"
           aria-label="adicionar transação"
@@ -370,7 +348,7 @@ const GerenciadorTransacoes = () => {
             position: "fixed",
             bottom: 20,
             right: 20,
-            display: { xs: "flex", md: "none" }, // Só mostra no mobile
+            display: { xs: "flex", md: "none" },
           }}
           onClick={() => abrirFormularioTransacao()}
         >

@@ -1,9 +1,9 @@
 import { signal } from "@preact/signals-react";
 
-// Estado da navegação
-export const telaAtual = signal("dashboard"); // dashboard, transacoes, categorias, resumo
+// default
 
-// Funções de navegação
+export const telaAtual = signal("dashboard");
+
 export const irParaDashboard = () => {
   telaAtual.value = "dashboard";
 };

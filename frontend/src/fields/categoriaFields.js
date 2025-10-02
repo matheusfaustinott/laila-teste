@@ -1,5 +1,4 @@
-// Campos de categorias
-import { stringsCategorias } from "../strings/categoryStrings";
+import { stringsCategorias } from "../strings/categoriaStrings";
 
 export const categoryFields = {
   nome: {

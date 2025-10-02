@@ -1,58 +1,56 @@
 import { Add, ArrowBack, Category, Delete, Edit } from "@mui/icons-material";
 import {
-  Box,
-  Button,
-  Card,
-  CardContent,
-  Chip,
-  Dialog,
-  DialogActions,
-  DialogContent,
-  DialogTitle,
-  Fab,
-  IconButton,
-  List,
-  ListItem,
-  ListItemText,
-  TextField,
-  Typography,
+    Box,
+    Button,
+    Card,
+    CardContent,
+    Chip,
+    Dialog,
+    DialogActions,
+    DialogContent,
+    DialogTitle,
+    Fab,
+    IconButton,
+    List,
+    ListItem,
+    ListItemText,
+    TextField,
+    Typography,
 } from "@mui/material";
 import { useSignals } from "@preact/signals-react/runtime";
-import { useEffect, useState } from "react";
+import { useEffect } from "react";
 import {
-  categoriaAtual,
-  categorias,
-  modoEdicaoCategoria,
-  mostrandoFormularioCategoria,
-  resetarFormularioCategoria,
-  selecionarCategoria,
+    abrirConfirmacaoRemocao,
+    categoriaAtual,
+    categoriaParaRemover,
+    categorias,
+    descricaoFormulario,
+    fecharConfirmacaoRemocao,
+    modoEdicaoCategoria,
+    mostrandoConfirmacaoRemocao,
+    mostrandoFormularioCategoria,
+    nomeFormulario,
+    preencherFormularioCategoria,
+    resetarFormularioCategoria,
+    selecionarCategoria,
 } from "../estado/categorias";
 import { irParaDashboard } from "../estado/navegacao";
 import { categoriasAPI } from "../servicos/api";
 import strings from "../strings";
+import { formatarData } from "../utils/formatadores";
 
 const GerenciadorCategorias = () => {
   useSignals();
-
-  // Estados locais do formulário
-  const [nome, setNome] = useState("");
-  const [descricao, setDescricao] = useState("");
-  const [mostrandoConfirmacao, setMostrandoConfirmacao] = useState(false);
-  const [categoriaParaRemover, setCategoriaParaRemover] = useState(null);
-
-  // Carrega categorias ao montar o componente
   useEffect(() => {
     carregarCategorias();
   }, []);
 
-  // Atualiza formulário quando categoria atual muda
   useEffect(() => {
     if (categoriaAtual.value) {
-      setNome(categoriaAtual.value.nome || "");
-      setDescricao(categoriaAtual.value.descricao || "");
+      preencherFormularioCategoria(categoriaAtual.value);
     } else {
-      setNome("");
-      setDescricao("");
+      nomeFormulario.value = "";
+      descricaoFormulario.value = "";
     }
   }, [categoriaAtual.value]);
 
@@ -70,16 +68,13 @@ const GerenciadorCategorias = () => {
 
   const abrirFormularioNovo = () => {
     resetarFormularioCategoria();
-    setNome("");
-    setDescricao("");
     modoEdicaoCategoria.value = false;
     mostrandoFormularioCategoria.value = true;
   };
 
   const abrirFormularioEdicao = (categoria) => {
     selecionarCategoria(categoria);
-    setNome(categoria.nome);
-    setDescricao(categoria.descricao || "");
+    preencherFormularioCategoria(categoria);
     modoEdicaoCategoria.value = true;
     mostrandoFormularioCategoria.value = true;
   };
@@ -87,22 +82,19 @@ const GerenciadorCategorias = () => {
   const fecharFormulario = () => {
     mostrandoFormularioCategoria.value = false;
     resetarFormularioCategoria();
-    setNome("");
-    setDescricao("");
   };
 
   const salvarCategoria = () => {
-    if (!nome.trim()) {
+    if (!nomeFormulario.value.trim()) {
       return;
     }
 
     const dados = {
-      nome: nome.trim(),
-      descricao: descricao.trim() || undefined,
+      nome: nomeFormulario.value.trim(),
+      descricao: descricaoFormulario.value.trim() || null,
     };
 
     if (modoEdicaoCategoria.value && categoriaAtual.value) {
-      // Editar categoria existente
       categoriasAPI.atualizar(
         categoriaAtual.value.id,
         dados,
@@ -115,7 +107,6 @@ const GerenciadorCategorias = () => {
         }
       );
     } else {
-      // Criar nova categoria
       categoriasAPI.criar(
         dados,
         () => {
@@ -130,35 +121,27 @@ const GerenciadorCategorias = () => {
   };
 
   const confirmarRemocao = (categoria) => {
-    setCategoriaParaRemover(categoria);
-    setMostrandoConfirmacao(true);
+    abrirConfirmacaoRemocao(categoria);
   };
 
   const removerCategoria = () => {
-    if (categoriaParaRemover) {
+    if (categoriaParaRemover.value) {
       categoriasAPI.remover(
-        categoriaParaRemover.id,
+        categoriaParaRemover.value.id,
         () => {
           carregarCategorias();
-          setMostrandoConfirmacao(false);
-          setCategoriaParaRemover(null);
+          fecharConfirmacaoRemocao();
         },
         (erro) => {
           console.error("Erro ao remover categoria:", erro);
-          setMostrandoConfirmacao(false);
-          setCategoriaParaRemover(null);
+          fecharConfirmacaoRemocao();
         }
       );
     }
   };
 
-  const formatarData = (data) => {
-    return new Date(data).toLocaleDateString("pt-BR");
-  };
-
   return (
     <Box sx={{ padding: 3, maxWidth: 1200, margin: "0 auto" }}>
-      {/* Cabeçalho */}
       <Box
         sx={{
           display: "flex",
@@ -175,13 +158,9 @@ const GerenciadorCategorias = () => {
           {strings.categorias.titulo}
         </Typography>
       </Box>
-
-      {/* Descrição */}
       <Typography variant="body1" color="textSecondary" paragraph>
         {strings.categorias.descricao}
       </Typography>
-
-      {/* Lista de categorias */}
       <Card>
         <CardContent>
           <Typography variant="h6" gutterBottom>
@@ -249,8 +228,6 @@ const GerenciadorCategorias = () => {
           )}
         </CardContent>
       </Card>
-
-      {/* Botão flutuante para adicionar */}
       <Fab
         color="primary"
         aria-label="adicionar categoria"
@@ -263,8 +240,6 @@ const GerenciadorCategorias = () => {
       >
         <Add />
       </Fab>
-
-      {/* Modal do formulário */}
       <Dialog
         open={mostrandoFormularioCategoria.value}
         onClose={fecharFormulario}
@@ -280,16 +255,16 @@ const GerenciadorCategorias = () => {
           <Box sx={{ display: "flex", flexDirection: "column", gap: 2, mt: 1 }}>
             <TextField
               label={strings.categorias.nomeCampo}
-              value={nome}
-              onChange={(e) => setNome(e.target.value)}
+              value={nomeFormulario.value}
+              onChange={(e) => (nomeFormulario.value = e.target.value)}
               required
               fullWidth
               variant="outlined"
             />
             <TextField
               label={strings.categorias.descricaoCampo}
-              value={descricao}
-              onChange={(e) => setDescricao(e.target.value)}
+              value={descricaoFormulario.value}
+              onChange={(e) => (descricaoFormulario.value = e.target.value)}
               fullWidth
               variant="outlined"
               multiline
@@ -305,7 +280,7 @@ const GerenciadorCategorias = () => {
           <Button
             onClick={salvarCategoria}
             variant="contained"
-            disabled={!nome.trim()}
+            disabled={!nomeFormulario.value.trim()}
           >
             {modoEdicaoCategoria.value
               ? strings.geral.atualizar
@@ -313,24 +288,19 @@ const GerenciadorCategorias = () => {
           </Button>
         </DialogActions>
       </Dialog>
-
-      {/* Modal de confirmação de remoção */}
       <Dialog
-        open={mostrandoConfirmacao}
-        onClose={() => setMostrandoConfirmacao(false)}
+        open={mostrandoConfirmacaoRemocao.value}
+        onClose={fecharConfirmacaoRemocao}
       >
         <DialogTitle>{strings.categorias.confirmarRemocao}</DialogTitle>
         <DialogContent>
           <Typography>
             {strings.categorias.confirmarRemocaoTexto}{" "}
-            <strong>{categoriaParaRemover?.nome}</strong>?
+            <strong>{categoriaParaRemover.value?.nome}</strong>?
           </Typography>
         </DialogContent>
         <DialogActions>
-          <Button
-            onClick={() => setMostrandoConfirmacao(false)}
-            color="inherit"
-          >
+          <Button onClick={fecharConfirmacaoRemocao} color="inherit">
             {strings.geral.cancelar}
           </Button>
           <Button onClick={removerCategoria} color="error" variant="contained">

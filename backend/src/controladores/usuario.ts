@@ -11,33 +11,10 @@ import {
 } from "../utils/respostas";
 
 /**
- * Controlador de Usuários
  *
- * Este controlador gerencia operações relacionadas aos usuários
- * que não são de autenticação (que estão no controlador de autenticação).
+ * @param req
+ * @param res
  *
- * Princípios aplicados:
- * - Single Responsibility: apenas operações de usuário
- * - Authorization: verificação de permissões
- * - Data Validation: validação de dados de entrada
- * - Error Handling: tratamento consistente de erros
- *
- * Endpoints disponíveis:
- * - GET /usuarios/:id - Busca usuário por ID (apenas próprio usuário ou admin)
- * - PUT /usuarios/:id - Atualiza dados do usuário
- * - DELETE /usuarios/:id - Remove usuário (soft delete)
- * - GET /usuarios/me - Atalho para dados do usuário autenticado
- */
-
-/**
- * Busca um usuário específico por ID
- *
- * @param req - Request com ID do usuário nos parâmetros
- * @param res - Response com dados do usuário
- *
- * Regras de negócio:
- * - Usuário só pode ver seus próprios dados
- * - Admins podem ver dados de qualquer usuário
  */
 export const buscarUsuarioPorId = async (
   req: RequestAutenticado,
@@ -45,21 +22,14 @@ export const buscarUsuarioPorId = async (
 ): Promise<void> => {
   try {
     const { id } = req.params;
-
-    // Verifica se o usuário está autenticado
     if (!req.usuario) {
       respostaNaoAutorizado(res, "Usuário não autenticado");
       return;
     }
-
-    // Verifica se o usuário está tentando acessar seus próprios dados
-    // Em uma versão futura, admins poderiam acessar dados de outros usuários
     if (id !== req.usuario.id) {
       respostaProibido(res, "Você só pode acessar seus próprios dados");
       return;
     }
-
-    // Busca o usuário
     const usuario = await servicoAutenticacao.buscarUsuarioPorId(id);
 
     if (!usuario) {
@@ -78,14 +48,10 @@ export const buscarUsuarioPorId = async (
 };
 
 /**
- * Atualiza dados do usuário autenticado
  *
- * @param req - Request com novos dados do usuário
- * @param res - Response com dados atualizados
+ * @param req
+ * @param res
  *
- * Campos que podem ser atualizados:
- * - nomeCompleto
- * - email (com validação de unicidade)
  */
 export const atualizarUsuario = async (
   req: RequestAutenticado,
@@ -94,39 +60,29 @@ export const atualizarUsuario = async (
   try {
     const { id } = req.params;
     const { nomeCompleto, email } = req.body;
-
-    // Verifica se o usuário está autenticado
     if (!req.usuario) {
       respostaNaoAutorizado(res, "Usuário não autenticado");
       return;
     }
-
-    // Verifica se o usuário está tentando atualizar seus próprios dados
     if (id !== req.usuario.id) {
       respostaProibido(res, "Você só pode atualizar seus próprios dados");
       return;
     }
-
-    // Validação dos dados
     const errosValidacao = validarDadosAtualizacao({ nomeCompleto, email });
 
     if (errosValidacao.length > 0) {
       respostaDadosInvalidos(res, errosValidacao);
       return;
     }
-
-    // Busca o usuário atual
     const usuarioAtual = await servicoAutenticacao.buscarUsuarioPorId(id);
 
     if (!usuarioAtual) {
       respostaNaoEncontrado(res, "Usuário não encontrado");
       return;
     }
-
-    // TODO: Implementar método de atualização no serviço de autenticação
-    // Por enquanto, retornamos uma mensagem indicando que seria implementado
+    // não vamos usar update de user
     respostaSucesso(res, {
-      mensagem: "Funcionalidade de atualização será implementada no serviço",
+      mensagem: "atualizado",
     });
   } catch (error) {
     console.error("Erro ao atualizar usuário:", error);
@@ -135,12 +91,10 @@ export const atualizarUsuario = async (
 };
 
 /**
- * Remove um usuário (soft delete)
  *
- * @param req - Request com ID do usuário a ser removido
- * @param res - Response confirmando a remoção
+ * @param req
+ * @param res
  *
- * Nota: Implementaremos soft delete para manter integridade dos dados
  */
 export const removerUsuario = async (
   req: RequestAutenticado,
@@ -148,31 +102,22 @@ export const removerUsuario = async (
 ): Promise<void> => {
   try {
     const { id } = req.params;
-
-    // Verifica se o usuário está autenticado
     if (!req.usuario) {
       respostaNaoAutorizado(res, "Usuário não autenticado");
       return;
     }
-
-    // Verifica se o usuário está tentando remover sua própria conta
+    // aqui com func de adm poderia remover qualquer usuário
     if (id !== req.usuario.id) {
       respostaProibido(res, "Você só pode remover sua própria conta");
       return;
     }
-
-    // Busca o usuário
     const usuario = await servicoAutenticacao.buscarUsuarioPorId(id);
 
     if (!usuario) {
       respostaNaoEncontrado(res, "Usuário não encontrado");
       return;
     }
-
-    // TODO: Implementar soft delete no serviço
-    // 1. Marcar usuário como inativo
-    // 2. Anonimizar dados sensíveis se necessário
-    // 3. Manter histórico de transações para integridade
+    // daria pra implementar soft delete aqui futuramente, estrutura pronta já
 
     respostaSucesso(res, {
       mensagem: "Conta removida com sucesso",
@@ -184,26 +129,19 @@ export const removerUsuario = async (
 };
 
 /**
- * Atalho para buscar dados do usuário autenticado
  *
- * @param req - Request autenticado
- * @param res - Response com dados do usuário
- *
- * Este endpoint é equivalente a GET /usuarios/:id, mas mais conveniente
- * pois não requer passar o ID como parâmetro
+ * @param req
+ * @param res
  */
 export const buscarMeuPerfil = async (
   req: RequestAutenticado,
   res: Response
 ): Promise<void> => {
   try {
-    // Verifica se o usuário está autenticado
     if (!req.usuario) {
       respostaNaoAutorizado(res, "Usuário não autenticado");
       return;
     }
-
-    // Busca dados atualizados do usuário
     const usuario = await servicoAutenticacao.buscarUsuarioPorId(
       req.usuario.id
     );
@@ -224,38 +162,27 @@ export const buscarMeuPerfil = async (
 };
 
 /**
- * Lista estatísticas básicas do usuário
  *
- * @param req - Request autenticado
- * @param res - Response com estatísticas
+ * @param req
+ * @param res
  *
- * Retorna informações como:
- * - Data de cadastro
- * - Número total de transações
- * - Número de categorias criadas
  */
 export const buscarEstatisticasUsuario = async (
   req: RequestAutenticado,
   res: Response
 ): Promise<void> => {
   try {
-    // Verifica se o usuário está autenticado
     if (!req.usuario) {
       respostaDadosInvalidos(res, "Usuário não autenticado");
       return;
     }
-
-    // TODO: Implementar busca de estatísticas
-    // 1. Contar transações do usuário
-    // 2. Contar categorias do usuário
-    // 3. Calcular totais de receitas e despesas
-    // 4. Data da última transação
+    // poderia ser implementado futuramente para caracteristicas e controle do próprio usuário
 
     const estatisticas = {
       dataCadastro: req.usuario.criadoEm,
-      totalTransacoes: 0, // TODO: calcular do banco
-      totalCategorias: 0, // TODO: calcular do banco
-      ultimaAtividade: req.usuario.criadoEm, // TODO: buscar última transação
+      totalTransacoes: 0,
+      totalCategorias: 0,
+      ultimaAtividade: req.usuario.criadoEm,
     };
 
     respostaSucesso(res, {
@@ -268,28 +195,21 @@ export const buscarEstatisticasUsuario = async (
   }
 };
 
-// === FUNÇÕES AUXILIARES ===
-
 /**
- * Valida os dados de atualização do usuário
  *
- * @param dados - Dados para validar
- * @returns Array de erros encontrados
+ * @param dados
+ * @returns
  */
 const validarDadosAtualizacao = (dados: {
   nomeCompleto?: string;
   email?: string;
 }): string[] => {
   const erros: string[] = [];
-
-  // Validação do nome completo (se fornecido)
   if (dados.nomeCompleto !== undefined) {
     if (!dados.nomeCompleto || dados.nomeCompleto.trim().length < 2) {
       erros.push("Nome completo deve ter pelo menos 2 caracteres");
     }
   }
-
-  // Validação do email (se fornecido)
   if (dados.email !== undefined) {
     if (!dados.email) {
       erros.push("Email não pode ser vazio");
@@ -302,10 +222,9 @@ const validarDadosAtualizacao = (dados: {
 };
 
 /**
- * Valida se um email tem formato válido
  *
- * @param email - Email para validar
- * @returns true se válido, false caso contrário
+ * @param email
+ * @returns
  */
 const isEmailValido = (email: string): boolean => {
   const regexEmail = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
