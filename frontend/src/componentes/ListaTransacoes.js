@@ -50,18 +50,14 @@ const ListaTransacoes = ({ onAtualizar }) => {
   };
 
   const getCorTipo = (tipo) => {
-    return tipo?.toUpperCase() === "RECEITA" ? "success" : "error";
+    return tipo === "receita" ? "success" : "error";
   };
 
   const getIconeTipo = (tipo) => {
-    return tipo?.toUpperCase() === "RECEITA" ? (
-      <TrendingUp />
-    ) : (
-      <TrendingDown />
-    );
+    return tipo === "receita" ? <TrendingUp /> : <TrendingDown />;
   };
 
-  const isReceita = (tipo) => tipo?.toUpperCase() === "RECEITA";
+  const isReceita = (tipo) => tipo === "receita";
 
   if (!transacoesFiltradas.value || transacoesFiltradas.value.length === 0) {
     return (

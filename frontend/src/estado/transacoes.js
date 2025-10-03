@@ -5,7 +5,7 @@ export const transacaoAtual = signal(null);
 export const carregandoTransacoes = signal(false);
 export const erroTransacoes = signal(null);
 
-export const filtrosTipo = signal("TODOS"); // TODOS, RECEITA, DESPESA
+export const filtrosTipo = signal("TODOS"); // TODOS, receita, despesa
 export const filtrosCategoria = signal(null);
 export const filtrosDataInicio = signal(null);
 export const filtrosDataFim = signal(null);
@@ -24,7 +24,7 @@ export const transacoesFiltradas = computed(() => {
 
   if (filtrosTipo.value !== "TODOS") {
     resultado = resultado.filter(
-      (transacao) => transacao.tipo?.toUpperCase() === filtrosTipo.value
+      (transacao) => transacao.tipo === filtrosTipo.value
     );
   }
 
@@ -54,11 +54,11 @@ export const estatisticasTransacoes = computed(() => {
   const transacoesList = transacoesFiltradas.value;
 
   const totalReceitas = transacoesList
-    .filter((t) => t.tipo?.toUpperCase() === "RECEITA")
+    .filter((t) => t.tipo === "receita")
     .reduce((total, t) => total + parseFloat(t.valor || 0), 0);
 
   const totalDespesas = transacoesList
-    .filter((t) => t.tipo?.toUpperCase() === "DESPESA")
+    .filter((t) => t.tipo === "despesa")
     .reduce((total, t) => total + parseFloat(t.valor || 0), 0);
 
   const saldo = totalReceitas - totalDespesas;
@@ -68,12 +68,10 @@ export const estatisticasTransacoes = computed(() => {
     totalDespesas,
     saldo,
     quantidadeTotal: transacoesList.length,
-    quantidadeReceitas: transacoesList.filter(
-      (t) => t.tipo?.toUpperCase() === "RECEITA"
-    ).length,
-    quantidadeDespesas: transacoesList.filter(
-      (t) => t.tipo?.toUpperCase() === "DESPESA"
-    ).length,
+    quantidadeReceitas: transacoesList.filter((t) => t.tipo === "receita")
+      .length,
+    quantidadeDespesas: transacoesList.filter((t) => t.tipo === "despesa")
+      .length,
   };
 });
 

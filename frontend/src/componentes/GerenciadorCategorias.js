@@ -1,43 +1,42 @@
 import { Add, ArrowBack, Category, Delete, Edit } from "@mui/icons-material";
 import {
-    Box,
-    Button,
-    Card,
-    CardContent,
-    Chip,
-    Dialog,
-    DialogActions,
-    DialogContent,
-    DialogTitle,
-    Fab,
-    IconButton,
-    List,
-    ListItem,
-    ListItemText,
-    TextField,
-    Typography,
+  Box,
+  Button,
+  Card,
+  CardContent,
+  Dialog,
+  DialogActions,
+  DialogContent,
+  DialogTitle,
+  Fab,
+  IconButton,
+  List,
+  ListItem,
+  ListItemText,
+  TextField,
+  Typography,
 } from "@mui/material";
+import { batch } from "@preact/signals-react";
 import { useSignals } from "@preact/signals-react/runtime";
 import { useEffect } from "react";
 import {
-    abrirConfirmacaoRemocao,
-    categoriaAtual,
-    categoriaParaRemover,
-    categorias,
-    descricaoFormulario,
-    fecharConfirmacaoRemocao,
-    modoEdicaoCategoria,
-    mostrandoConfirmacaoRemocao,
-    mostrandoFormularioCategoria,
-    nomeFormulario,
-    preencherFormularioCategoria,
-    resetarFormularioCategoria,
-    selecionarCategoria,
+  abrirConfirmacaoRemocao,
+  categoriaAtual,
+  categoriaParaRemover,
+  categorias,
+  descricaoFormulario,
+  fecharConfirmacaoRemocao,
+  modoEdicaoCategoria,
+  mostrandoConfirmacaoRemocao,
+  mostrandoFormularioCategoria,
+  nomeFormulario,
+  preencherFormularioCategoria,
+  resetarFormularioCategoria,
+  selecionarCategoria,
 } from "../estado/categorias";
 import { irParaDashboard } from "../estado/navegacao";
 import { categoriasAPI } from "../servicos/api";
 import strings from "../strings";
-import { formatarData } from "../utils/formatadores";
 
 const GerenciadorCategorias = () => {
   useSignals();
@@ -56,7 +55,7 @@ const GerenciadorCategorias = () => {
 
   const carregarCategorias = () => {
     categoriasAPI.listar(
-      {}, // ta pasando vazio
+      {},
       (dados) => {
         categorias.value = dados.categorias || [];
       },
@@ -66,22 +65,28 @@ const GerenciadorCategorias = () => {
     );
   };
 
-  const abrirFormularioNovo = () => { // utilizar bath
-    resetarFormularioCategoria();
-    modoEdicaoCategoria.value = false;
-    mostrandoFormularioCategoria.value = true;
+  const abrirFormularioNovo = () => {
+    batch(() => {
+      resetarFormularioCategoria();
+      modoEdicaoCategoria.value = false;
+      mostrandoFormularioCategoria.value = true;
+    });
   };
 
   const abrirFormularioEdicao = (categoria) => {
-    selecionarCategoria(categoria);
-    preencherFormularioCategoria(categoria);
-    modoEdicaoCategoria.value = true;
-    mostrandoFormularioCategoria.value = true;
+    batch(() => {
+      selecionarCategoria(categoria);
+      preencherFormularioCategoria(categoria);
+      modoEdicaoCategoria.value = true;
+      mostrandoFormularioCategoria.value = true;
+    });
   };
 
   const fecharFormulario = () => {
-    mostrandoFormularioCategoria.value = false;
-    resetarFormularioCategoria();
+    batch(() => {
+      mostrandoFormularioCategoria.value = false;
+      resetarFormularioCategoria();
+    });
   };
 
   const salvarCategoria = () => {
@@ -126,7 +131,7 @@ const GerenciadorCategorias = () => {
 
   const removerCategoria = () => {
     if (categoriaParaRemover.value) {
-      categoriasAPI.remover(
+      categoriasAPI.excluir(
         categoriaParaRemover.value.id,
         () => {
           carregarCategorias();
@@ -197,30 +202,29 @@ const GerenciadorCategorias = () => {
                         <Typography variant="subtitle1" component="span">
                           {categoria.nome}
                         </Typography>
-                        <Chip
-                          label={formatarData(categoria.criadoEm)}
-                          size="small"
-                          variant="outlined"
-                        />
                       </Box>
                     }
                     secondary={categoria.descricao || "Sem descrição"}
                   />
                   <Box sx={{ display: "flex", gap: 1 }}>
-                    <IconButton
-                      size="small"
-                      color="primary"
-                      onClick={() => abrirFormularioEdicao(categoria)}
-                    >
-                      <Edit />
-                    </IconButton>
-                    <IconButton
-                      size="small"
-                      color="error"
-                      onClick={() => confirmarRemocao(categoria)}
-                    >
-                      <Delete />
-                    </IconButton>
+                    {categoria.nome !== "Outras" && (
+                      <>
+                        <IconButton
+                          size="small"
+                          color="primary"
+                          onClick={() => abrirFormularioEdicao(categoria)}
+                        >
+                          <Edit />
+                        </IconButton>
+                        <IconButton
+                          size="small"
+                          color="error"
+                          onClick={() => confirmarRemocao(categoria)}
+                        >
+                          <Delete />
+                        </IconButton>
+                      </>
+                    )}
                   </Box>
                 </ListItem>
               ))}

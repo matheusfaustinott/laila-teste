@@ -5,7 +5,7 @@ export const stringsCategorias = {
   novaCategoria: "Nova Categoria",
   editarCategoria: "Editar Categoria",
   listagemTitulo: "Suas Categorias",
-  descricao: "Organize suas transações criando categorias personalizadas",
+  descricaoSecao: "Organize suas transações criando categorias personalizadas",
   nome: "Nome da Categoria",
   nomeCampo: "Nome",
   cor: "Cor",

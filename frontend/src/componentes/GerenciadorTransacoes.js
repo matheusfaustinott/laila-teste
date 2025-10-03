@@ -35,7 +35,6 @@ import {
   limparFiltros,
   termoBusca,
   transacoes,
-  transacoesFiltradas,
 } from "../estado/transacoes";
 import { categoriasAPI, transacoesAPI } from "../servicos/api";
 import strings from "../strings";
@@ -54,7 +53,6 @@ const GerenciadorTransacoes = () => {
     transacoesAPI.listar(
       {},
       (dados) => {
-        // Garantir que os valores sejam números
         const transacoesProcessadas = (dados.transacoes || []).map(
           (transacao) => ({
             ...transacao,
@@ -93,7 +91,7 @@ const GerenciadorTransacoes = () => {
     termoBusca.value = event.target.value;
   };
 
-  const stats = estatisticasTransacoes.value; // n faz sentido
+  const stats = estatisticasTransacoes.value;
 
   return (
     <Box
@@ -268,10 +266,10 @@ const GerenciadorTransacoes = () => {
                       <MenuItem value="TODOS">
                         {strings.transacoes.todos}
                       </MenuItem>
-                      <MenuItem value="RECEITA">
+                      <MenuItem value="receita">
                         {strings.transacoes.receitas}
                       </MenuItem>
-                      <MenuItem value="DESPESA">
+                      <MenuItem value="despesa">
                         {strings.transacoes.despesas}
                       </MenuItem>
                     </Select>
@@ -282,7 +280,7 @@ const GerenciadorTransacoes = () => {
                     <Select
                       value={filtrosCategoria.value || ""}
                       onChange={handleFiltroCategoria}
-                      label="Categoria" // strings
+                      label={strings.transacoes.categoriaLabel}
                     >
                       <MenuItem value="">{strings.transacoes.todas}</MenuItem>
                       {categorias.value.map((categoria) => (
@@ -312,7 +310,11 @@ const GerenciadorTransacoes = () => {
                 >
                   {filtrosTipo.value !== "TODOS" && (
                     <Chip
-                      label={`${strings.transacoes.filtroTipo}: ${filtrosTipo.value}`}
+                      label={`${strings.transacoes.filtroTipo}: ${
+                        filtrosTipo.value === "receita"
+                          ? strings.transacoes.receita
+                          : strings.transacoes.despesa
+                      }`}
                       onDelete={() => (filtrosTipo.value = "TODOS")}
                       color="primary"
                       size="small"
@@ -341,10 +343,7 @@ const GerenciadorTransacoes = () => {
                 </Box>
               </CardContent>
             </Card>
-            <ListaTransacoes
-              transacoes={transacoesFiltradas.value} // n preciso passar como props
-              onAtualizar={carregarTransacoes}
-            />
+            <ListaTransacoes onAtualizar={carregarTransacoes} />
           </CardContent>
         </Card>
         <FormularioTransacao onSucesso={carregarTransacoes} />

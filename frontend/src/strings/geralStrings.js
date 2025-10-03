@@ -30,7 +30,7 @@ export const stringsGerais = {
   buscar: "Buscar",
   filtrar: "Filtrar",
   limpar: "Limpar",
-  atualizar: "Atualizar",
+  atualizado: "Atualizado",
   voltar: "Voltar",
   proximo: "Próximo",
   anterior: "Anterior",

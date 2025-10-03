@@ -39,21 +39,26 @@ const FormularioTransacao = ({ onSucesso }) => {
   } = useForm();
 
   const watchTipo = watch("tipo");
+  const watchCategoriaId = watch("categoriaId");
 
   useEffect(() => {
     if (mostrandoFormularioTransacao.value) {
       if (modoEdicao.value && transacaoAtual.value) {
         const transacao = transacaoAtual.value;
+        reset();
         setValue("titulo", transacao.titulo);
         setValue("valor", transacao.valor);
         setValue("tipo", transacao.tipo);
         setValue("categoriaId", transacao.categoria?.id || "");
-        setValue("data", transacao.data?.split("T")[0] || ""); // Formata para input date
-        setValue("observacoes", transacao.observacoes || "");
+        setValue("data", transacao.data?.split("T")[0] || "");
+        setValue("observacoes", transacao.descricao || "");
       } else {
         reset();
-        const hoje = new Date().toISOString().split("T")[0];
-        setValue("data", hoje);
+        const hoje = new Date();
+        const dataLocal = new Date(
+          hoje.getTime() - hoje.getTimezoneOffset() * 60000
+        );
+        setValue("data", dataLocal.toISOString().split("T")[0]);
       }
     }
   }, [
@@ -73,9 +78,12 @@ const FormularioTransacao = ({ onSucesso }) => {
     const dadosFormatados = {
       ...dados,
       valor: parseFloat(dados.valor),
+      tipo: dados.tipo,
       categoriaId: dados.categoriaId || null,
-      observacoes: dados.observacoes || null,
+      descricao: dados.observacoes || null,
+      data: dados.data,
     };
+    delete dadosFormatados.observacoes;
 
     const callbackSucesso = () => {
       handleFechar();
@@ -161,7 +169,7 @@ const FormularioTransacao = ({ onSucesso }) => {
                   "categoriaId",
                   transactionFields.categoria.validation
                 )}
-                defaultValue=""
+                value={watchCategoriaId || ""}
               >
                 {categorias.value.map((categoria) => (
                   <MenuItem key={categoria.id} value={categoria.id}>

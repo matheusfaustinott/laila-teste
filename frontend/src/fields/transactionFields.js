@@ -41,8 +41,8 @@ export const transactionFields = {
       required: stringsTransacoes.tipoObrigatorio,
     },
     options: [
-      { value: "RECEITA", label: stringsTransacoes.receita },
-      { value: "DESPESA", label: stringsTransacoes.despesa },
+      { value: "receita", label: stringsTransacoes.receita },
+      { value: "despesa", label: stringsTransacoes.despesa },
     ],
   },
 

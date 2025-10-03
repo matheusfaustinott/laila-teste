@@ -34,7 +34,7 @@ import {
 const ResumoMensal = () => {
   useSignals();
   const resumo = useSignal(null);
-  const carregando = useSignal(false); // verificar todos ponto value
+  const carregando = useSignal(false);
   const ano = useSignal(new Date().getFullYear());
   const mes = useSignal(new Date().getMonth() + 1);
 
@@ -312,7 +312,7 @@ const ResumoMensal = () => {
                       ? `${formatarMes(resumo.value.periodo.mes)} de ${
                           resumo.value.periodo.ano
                         }`
-                      : "Dados não disponíveis"}
+                      : strings.resumo.nenhumDadoEncontrado}
                   </Typography>
                 </Grid>
               </Grid>
