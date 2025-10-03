@@ -36,28 +36,28 @@ const tratarErro = (error, callbackErro = null) => {
 
     switch (error.response.status) {
       case 400:
-        titulo = "Dados Inválidos";
+        titulo = strings.geral.erro;
         break;
       case 403:
-        titulo = "Acesso Negado";
+        titulo = strings.geral.acessoNegado;
         break;
       case 404:
-        titulo = "Não Encontrado";
+        titulo = strings.geral.naoEncontrado;
         break;
       case 500:
-        titulo = "Erro do Servidor";
+        titulo = strings.geral.erroServidor;
         break;
       default:
         titulo = strings.geral.erro;
     }
   } else if (error.request) {
     console.log("Erro de rede:", error.request);
-    mensagem = strings.autenticacao.erroConexao;
-    titulo = "Erro de Conexão";
+    mensagem = strings.geral.erroConexao;
+    titulo = strings.geral.erro;
   } else {
     console.log("Erro na configuração da requisição:", error.message);
-    mensagem = "Erro ao configurar requisição: " + error.message;
-    titulo = "Erro de Configuração";
+    mensagem = strings.geral.erroGeral + ": " + error.message;
+    titulo = strings.geral.erro;
   }
 
   if (callbackErro) {
@@ -131,7 +131,7 @@ export const autenticacaoAPI = {
   },
 
   buscarPerfil: (callbackSucesso = null, callbackErro = null) => {
-    mostrarModalCarregamento("Carregando perfil...");
+    mostrarModalCarregamento(strings.autenticacao.carregandoPerfil);
 
     axios
       .get(`${config.API_BASE_URL}${config.API_ENDPOINTS.AUTH.PROFILE}`, {
@@ -282,7 +282,7 @@ export const transacoesAPI = {
   },
 
   resumoMensal: (ano, mes, callbackSucesso = null, callbackErro = null) => {
-    mostrarModalCarregamento("Carregando resumo mensal...");
+    mostrarModalCarregamento(strings.resumo.carregandoResumo);
 
     axios
       .get(

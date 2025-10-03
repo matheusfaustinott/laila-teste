@@ -27,28 +27,6 @@ export const categoryFields = {
     defaultValue: "#1a237e",
   },
 
-  icone: {
-    name: "icone",
-    label: stringsCategorias.icone,
-    type: "select",
-    required: false,
-    validation: {},
-    options: [
-      { value: "home", label: stringsCategorias.icones.home },
-      { value: "alimentacao", label: stringsCategorias.icones.alimentacao },
-      { value: "transporte", label: stringsCategorias.icones.transporte },
-      { value: "saude", label: stringsCategorias.icones.saude },
-      { value: "educacao", label: stringsCategorias.icones.educacao },
-      { value: "lazer", label: stringsCategorias.icones.lazer },
-      { value: "compras", label: stringsCategorias.icones.compras },
-      { value: "trabalho", label: stringsCategorias.icones.trabalho },
-      { value: "investimentos", label: stringsCategorias.icones.investimentos },
-      { value: "servicos", label: stringsCategorias.icones.servicos },
-      { value: "viagem", label: stringsCategorias.icones.viagem },
-      { value: "outros", label: stringsCategorias.icones.outros },
-    ],
-  },
-
   descricao: {
     name: "descricao",
     label: stringsCategorias.descricao,

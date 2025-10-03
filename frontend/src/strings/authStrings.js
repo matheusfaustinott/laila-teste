@@ -13,9 +13,10 @@ export const stringsAutenticacao = {
   linkParaLogin: "Faça login",
   textoSemConta: "Não tem uma conta? ",
   textoComConta: "Já tem uma conta? ",
-  carregandoLogin: "Entrando...",
-  carregandoCadastro: "Cadastrando...",
-  carregandoLogout: "Saindo...",
+  carregandoLogin: "Entrando",
+  carregandoCadastro: "Cadastrando",
+  carregandoPerfil: "Carregando perfil",
+  carregandoLogout: "Saindo",
   sucessoLogin: "Login realizado com sucesso!",
   sucessoCadastro: "Cadastro realizado com sucesso!",
   sucessoCadastroDescricao:
