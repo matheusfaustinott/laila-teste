@@ -54,7 +54,14 @@ const GerenciadorTransacoes = () => {
     transacoesAPI.listar(
       {},
       (dados) => {
-        transacoes.value = dados.transacoes || [];
+        // Garantir que os valores sejam números
+        const transacoesProcessadas = (dados.transacoes || []).map(
+          (transacao) => ({
+            ...transacao,
+            valor: parseFloat(transacao.valor || 0),
+          })
+        );
+        transacoes.value = transacoesProcessadas;
       },
       (erro) => {
         console.error("Erro ao carregar transações:", erro);

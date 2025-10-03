@@ -12,12 +12,15 @@ import {
 } from "@mui/material";
 import { useSignals } from "@preact/signals-react/runtime";
 import { mostrarModalConfirmacao } from "../estado/modais";
-import { abrirFormularioTransacao } from "../estado/transacoes";
+import {
+  abrirFormularioTransacao,
+  transacoesFiltradas,
+} from "../estado/transacoes";
 import { transacoesAPI } from "../servicos/api";
 import strings from "../strings";
 import { formatarData, formatarMoeda } from "../utils/formatadores";
 
-const ListaTransacoes = ({ transacoes, onAtualizar }) => {
+const ListaTransacoes = ({ onAtualizar }) => {
   useSignals();
 
   const handleEditar = (transacao) => {
@@ -47,24 +50,28 @@ const ListaTransacoes = ({ transacoes, onAtualizar }) => {
   };
 
   const getCorTipo = (tipo) => {
-    const tipoUpperCase = tipo?.toUpperCase();
-    return tipoUpperCase === "RECEITA" ? "success" : "error";
+    return tipo?.toUpperCase() === "RECEITA" ? "success" : "error";
   };
 
   const getIconeTipo = (tipo) => {
-    const tipoUpperCase = tipo?.toUpperCase();
-    return tipoUpperCase === "RECEITA" ? <TrendingUp /> : <TrendingDown />;
+    return tipo?.toUpperCase() === "RECEITA" ? (
+      <TrendingUp />
+    ) : (
+      <TrendingDown />
+    );
   };
 
-  if (!transacoes || transacoes.length === 0) {
+  const isReceita = (tipo) => tipo?.toUpperCase() === "RECEITA";
+
+  if (!transacoesFiltradas.value || transacoesFiltradas.value.length === 0) {
     return (
-      <Card>
+      <Card sx={{ width: "100%" }}>
         <CardContent sx={{ textAlign: "center", padding: 4 }}>
           <Typography variant="h6" color="textSecondary" gutterBottom>
             {strings.transacoes.nenhumaTransacaoEncontrada}
           </Typography>
           <Typography variant="body2" color="textSecondary">
-            {transacoes === null
+            {transacoesFiltradas.value === null
               ? strings.transacoes.carregandoTransacoes
               : strings.transacoes.adicionePrimeiraTransacao}
           </Typography>
@@ -74,21 +81,141 @@ const ListaTransacoes = ({ transacoes, onAtualizar }) => {
   }
 
   return (
-    <Card>
+    <Card sx={{ width: "100%" }}>
       <CardContent sx={{ padding: 0 }}>
-        <List>
-          {transacoes.map((transacao, index) => (
+        <List sx={{ width: "100%" }}>
+          {transacoesFiltradas.value.map((transacao, index) => (
             <ListItem
               key={transacao.id}
               sx={{
                 borderBottom:
-                  index < transacoes.length - 1 ? "1px solid #eee" : "none",
-                padding: 2,
+                  index < transacoesFiltradas.value.length - 1
+                    ? "1px solid #eee"
+                    : "none",
+                padding: { xs: 1.5, sm: 2 },
+                flexDirection: { xs: "column", sm: "row" },
+                alignItems: { xs: "stretch", sm: "center" },
+                gap: { xs: 1.5, sm: 2 },
+                width: "100%",
               }}
             >
               <Box
                 sx={{
-                  display: "flex",
+                  display: { xs: "block", sm: "none" },
+                  width: "100%",
+                }}
+              >
+                <Box
+                  sx={{
+                    display: "flex",
+                    alignItems: "flex-start",
+                    justifyContent: "space-between",
+                    mb: 1,
+                  }}
+                >
+                  <Box
+                    sx={{
+                      display: "flex",
+                      alignItems: "center",
+                      gap: 1.5,
+                      flex: 1,
+                    }}
+                  >
+                    <Avatar
+                      sx={{
+                        bgcolor: `${getCorTipo(transacao.tipo)}.main`,
+                        width: 36,
+                        height: 36,
+                      }}
+                    >
+                      {getIconeTipo(transacao.tipo)}
+                    </Avatar>
+                    <Box sx={{ flex: 1, minWidth: 0 }}>
+                      <Typography variant="subtitle1" fontWeight="600" noWrap>
+                        {transacao.titulo}
+                      </Typography>
+                      <Typography variant="caption" color="textSecondary">
+                        {formatarData(transacao.data)}
+                      </Typography>
+                    </Box>
+                  </Box>
+                  <Typography
+                    variant="h6"
+                    color={`${getCorTipo(transacao.tipo)}.main`}
+                    fontWeight="700"
+                    sx={{ textAlign: "right" }}
+                  >
+                    {isReceita(transacao.tipo) ? "+" : "-"}
+                    {formatarMoeda(transacao.valor)}
+                  </Typography>
+                </Box>
+
+                <Box
+                  sx={{
+                    display: "flex",
+                    alignItems: "center",
+                    gap: 1,
+                    mb: 1.5,
+                  }}
+                >
+                  <Chip
+                    label={
+                      isReceita(transacao.tipo)
+                        ? strings.transacoes.receita
+                        : strings.transacoes.despesa
+                    }
+                    size="small"
+                    color={getCorTipo(transacao.tipo)}
+                    variant="outlined"
+                  />
+                  {transacao.categoria && (
+                    <Chip
+                      label={transacao.categoria.nome}
+                      size="small"
+                      variant="outlined"
+                    />
+                  )}
+                </Box>
+
+                {transacao.descricao && (
+                  <Typography
+                    variant="body2"
+                    color="textSecondary"
+                    sx={{
+                      display: "-webkit-box",
+                      WebkitLineClamp: 2,
+                      WebkitBoxOrient: "vertical",
+                      overflow: "hidden",
+                      mb: 1.5,
+                    }}
+                  >
+                    {transacao.descricao}
+                  </Typography>
+                )}
+
+                <Box
+                  sx={{ display: "flex", justifyContent: "flex-end", gap: 1 }}
+                >
+                  <IconButton
+                    size="small"
+                    onClick={() => handleEditar(transacao)}
+                    color="primary"
+                  >
+                    <Edit fontSize="small" />
+                  </IconButton>
+                  <IconButton
+                    size="small"
+                    onClick={() => handleExcluir(transacao)}
+                    color="error"
+                  >
+                    <Delete fontSize="small" />
+                  </IconButton>
+                </Box>
+              </Box>
+
+              <Box
+                sx={{
+                  display: { xs: "none", sm: "flex" },
                   alignItems: "center",
                   width: "100%",
                   gap: 2,
@@ -103,7 +230,7 @@ const ListaTransacoes = ({ transacoes, onAtualizar }) => {
                 >
                   {getIconeTipo(transacao.tipo)}
                 </Avatar>
-                <Box sx={{ flex: 1 }}>
+                <Box sx={{ flex: 1, minWidth: 0 }}>
                   <Typography variant="h6" noWrap>
                     {transacao.titulo}
                   </Typography>
@@ -131,7 +258,7 @@ const ListaTransacoes = ({ transacoes, onAtualizar }) => {
                       variant="body2"
                       color="textSecondary"
                       sx={{
-                        marginTop: 0.5,
+                        mt: 0.5,
                         display: "-webkit-box",
                         WebkitLineClamp: 2,
                         WebkitBoxOrient: "vertical",
@@ -146,14 +273,14 @@ const ListaTransacoes = ({ transacoes, onAtualizar }) => {
                   <Typography
                     variant="h6"
                     color={`${getCorTipo(transacao.tipo)}.main`}
-                    fontWeight="bold"
+                    fontWeight="700"
                   >
-                    {transacao.tipo?.toUpperCase() === "DESPESA" ? "-" : "+"}
+                    {isReceita(transacao.tipo) ? "+" : "-"}
                     {formatarMoeda(transacao.valor)}
                   </Typography>
                   <Chip
                     label={
-                      transacao.tipo?.toUpperCase() === "RECEITA"
+                      isReceita(transacao.tipo)
                         ? strings.transacoes.receita
                         : strings.transacoes.despesa
                     }
@@ -169,7 +296,6 @@ const ListaTransacoes = ({ transacoes, onAtualizar }) => {
                     size="small"
                     onClick={() => handleEditar(transacao)}
                     color="primary"
-                    title={strings.geral.editar}
                   >
                     <Edit fontSize="small" />
                   </IconButton>
@@ -177,7 +303,6 @@ const ListaTransacoes = ({ transacoes, onAtualizar }) => {
                     size="small"
                     onClick={() => handleExcluir(transacao)}
                     color="error"
-                    title={strings.geral.excluir}
                   >
                     <Delete fontSize="small" />
                   </IconButton>

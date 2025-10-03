@@ -55,11 +55,11 @@ export const estatisticasTransacoes = computed(() => {
 
   const totalReceitas = transacoesList
     .filter((t) => t.tipo?.toUpperCase() === "RECEITA")
-    .reduce((total, t) => total + t.valor, 0);
+    .reduce((total, t) => total + parseFloat(t.valor || 0), 0);
 
   const totalDespesas = transacoesList
     .filter((t) => t.tipo?.toUpperCase() === "DESPESA")
-    .reduce((total, t) => total + t.valor, 0);
+    .reduce((total, t) => total + parseFloat(t.valor || 0), 0);
 
   const saldo = totalReceitas - totalDespesas;
 

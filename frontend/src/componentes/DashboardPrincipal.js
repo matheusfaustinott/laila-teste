@@ -128,7 +128,12 @@ const DashboardPrincipal = () => {
             <Typography variant="body2" color="textSecondary">
               {strings.geral.gerencieTransacoesTexto}
             </Typography>
-            <Button variant="contained" size="small" onClick={irParaTransacoes}>
+            <Button
+              variant="contained"
+              size="small"
+              onClick={irParaTransacoes}
+              sx={{ marginTop: 2 }}
+            >
               {strings.geral.acessar}
             </Button>
           </CardContent>
@@ -149,7 +154,12 @@ const DashboardPrincipal = () => {
             <Typography variant="body2" color="textSecondary">
               {strings.geral.organizeCategorias}
             </Typography>
-            <Button variant="contained" size="small" onClick={irParaCategorias}>
+            <Button
+              variant="contained"
+              size="small"
+              onClick={irParaCategorias}
+              sx={{ marginTop: 2 }}
+            >
               {strings.geral.acessar}
             </Button>
           </CardContent>
@@ -170,7 +180,12 @@ const DashboardPrincipal = () => {
             <Typography variant="body2" color="textSecondary">
               {strings.geral.acompanheResumo}
             </Typography>
-            <Button variant="contained" size="small" onClick={irParaResumo}>
+            <Button
+              variant="contained"
+              size="small"
+              onClick={irParaResumo}
+              sx={{ marginTop: 2 }}
+            >
               {strings.geral.acessar}
             </Button>
           </CardContent>
