@@ -189,29 +189,6 @@ class ServicoCategorias {
     if (!categoria) {
       throw new Error("Categoria não encontrada");
     }
-    if (
-      !forcarRemocao &&
-      categoria.transacoes &&
-      categoria.transacoes.length > 0
-    ) {
-      throw new Error(
-        "Não é possível remover categoria que possui transações associadas. " +
-          "Remova ou altere a categoria das transações primeiro."
-      );
-    }
-    if (
-      forcarRemocao &&
-      categoria.transacoes &&
-      categoria.transacoes.length > 0
-    ) {
-      // podemos futuramente tratar como a transasao vai ficar caso a categoria dela for removida
-      await this.repositorioCategoria
-        .createQueryBuilder()
-        .update("transacao")
-        .set({ categoria: null })
-        .where("categoriaId = :categoriaId", { categoriaId })
-        .execute();
-    }
     await this.repositorioCategoria.remove(categoria);
   }
 
