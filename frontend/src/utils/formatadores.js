@@ -10,13 +10,27 @@ export const formatarMoeda = (valor) => {
 export const formatarData = (data) => {
   if (!data) return "-";
 
-  if (typeof data === "string" && data.match(/^\d{4}-\d{2}-\d{2}T/)) {
-    const [dataApenas] = data.split("T");
-    const [ano, mes, dia] = dataApenas.split("-");
-    return `${dia}/${mes}/${ano}`;
+  if (typeof data === "string") {
+    if (data.match(/^\d{4}-\d{2}-\d{2}T/)) {
+      const [dataApenas] = data.split("T");
+      const [ano, mes, dia] = dataApenas.split("-");
+      return `${dia}/${mes}/${ano}`;
+    }
+
+    if (data.match(/^\d{4}-\d{2}-\d{2}$/)) {
+      const [ano, mes, dia] = data.split("-");
+      return `${dia}/${mes}/${ano}`;
+    }
   }
 
-  return new Date(data).toLocaleDateString("pt-BR");
+  const dataObj = new Date(data);
+  if (isNaN(dataObj.getTime())) return "-";
+
+  const ano = dataObj.getUTCFullYear();
+  const mes = String(dataObj.getUTCMonth() + 1).padStart(2, "0");
+  const dia = String(dataObj.getUTCDate()).padStart(2, "0");
+
+  return `${dia}/${mes}/${ano}`;
 };
 
 export const formatarDataHora = (data) => {
@@ -30,7 +44,16 @@ export const formatarDataHora = (data) => {
     return `${dia}/${mes}/${ano} ${hh}:${mm}`;
   }
 
-  return new Date(data).toLocaleString("pt-BR");
+  const dataObj = new Date(data);
+  if (isNaN(dataObj.getTime())) return "-";
+
+  const ano = dataObj.getUTCFullYear();
+  const mes = String(dataObj.getUTCMonth() + 1).padStart(2, "0");
+  const dia = String(dataObj.getUTCDate()).padStart(2, "0");
+  const hh = String(dataObj.getUTCHours()).padStart(2, "0");
+  const mm = String(dataObj.getUTCMinutes()).padStart(2, "0");
+
+  return `${dia}/${mes}/${ano} ${hh}:${mm}`;
 };
 
 export const formatarNumero = (numero, decimais = 0) => {
