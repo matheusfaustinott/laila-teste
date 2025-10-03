@@ -210,7 +210,7 @@ CREATE TABLE usuarios (
     criadoEm TIMESTAMP DEFAULT NOW()
 );
 
--- Categorias
+-- Categorias (com categorias padrão criadas automaticamente)
 CREATE TABLE categorias (
     id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
     nome VARCHAR NOT NULL,
@@ -219,7 +219,7 @@ CREATE TABLE categorias (
     criadoEm TIMESTAMP DEFAULT NOW()
 );
 
--- Transações
+-- Transações (categoriaId é obrigatório)
 CREATE TABLE transacoes (
     id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
     titulo VARCHAR NOT NULL,
@@ -228,9 +228,26 @@ CREATE TABLE transacoes (
     tipo ENUM('receita', 'despesa') NOT NULL,
     data DATE NOT NULL,
     usuarioId UUID NOT NULL REFERENCES usuarios(id),
-    categoriaId UUID REFERENCES categorias(id),
+    categoriaId UUID NOT NULL REFERENCES categorias(id),
     criadoEm TIMESTAMP DEFAULT NOW()
 );
 ```
+
+### Regras de Negócio
+
+- **Categorias Padrão**: Ao criar um usuário, são automaticamente criadas 4 categorias padrão:
+
+  - "Mercado" - Para gastos com alimentação e supermercado
+  - "Salário" - Para receitas de trabalho
+  - "Hobbie" - Para gastos com lazer e entretenimento
+  - "Outras" - Categoria padrão para transações sem categoria específica
+
+- **Categoria "Outras"**:
+
+  - Não pode ser editada nem excluída
+  - Serve como fallback automático para transações
+  - Ao excluir outras categorias, suas transações são transferidas para "Outras"
+
+- **Transações**: Sempre devem ter uma categoria associada (campo obrigatório)
 
 **Desenvolvido por**: Matheus Faustino
