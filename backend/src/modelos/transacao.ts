@@ -39,8 +39,8 @@ export class Transacao {
   usuario!: Usuario;
 
   @ManyToOne(() => Categoria, (categoria) => categoria.transacoes, {
-    nullable: true,
+    nullable: false,
   })
   @JoinColumn({ name: "categoriaId" })
-  categoria?: Categoria;
+  categoria!: Categoria;
 }

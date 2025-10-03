@@ -163,6 +163,31 @@ class ServicoTransacoes {
     if (categoriaId) {
       await this.validarCategoria(categoriaId, usuarioId);
     }
+    let categoriaFinal: Categoria;
+    if (categoriaId) {
+      const categoria = await this.repositorioCategoria.findOne({
+        where: {
+          id: categoriaId,
+          usuario: { id: usuarioId },
+        },
+      });
+      if (!categoria) {
+        throw new Error("Categoria não encontrada");
+      }
+      categoriaFinal = categoria;
+    } else {
+      const categoriaOutras = await this.repositorioCategoria.findOne({
+        where: {
+          nome: "Outras",
+          usuario: { id: usuarioId },
+        },
+      });
+      if (!categoriaOutras) {
+        throw new Error("Categoria padrão 'Outras' não encontrada");
+      }
+      categoriaFinal = categoriaOutras;
+    }
+
     const novaTransacao = this.repositorioTransacao.create({
       titulo: titulo.trim(),
       descricao: descricao?.trim(),
@@ -170,7 +195,7 @@ class ServicoTransacoes {
       tipo: tipo.toLowerCase() as "receita" | "despesa",
       data: new Date(data),
       usuario: { id: usuarioId },
-      categoria: categoriaId ? { id: categoriaId } : undefined,
+      categoria: categoriaFinal,
     });
     const transacaoSalva = await this.repositorioTransacao.save(novaTransacao);
 
@@ -220,9 +245,20 @@ class ServicoTransacoes {
       transacao.data = new Date(dadosAtualizacao.data);
     }
     if (dadosAtualizacao.categoriaId !== undefined) {
-      transacao.categoria = dadosAtualizacao.categoriaId
-        ? ({ id: dadosAtualizacao.categoriaId } as Categoria)
-        : undefined;
+      if (dadosAtualizacao.categoriaId) {
+        transacao.categoria = { id: dadosAtualizacao.categoriaId } as Categoria;
+      } else {
+        const categoriaOutras = await this.repositorioCategoria.findOne({
+          where: {
+            nome: "Outras",
+            usuario: { id: usuarioId },
+          },
+        });
+        if (!categoriaOutras) {
+          throw new Error("Categoria padrão 'Outras' não encontrada");
+        }
+        transacao.categoria = categoriaOutras;
+      }
     }
     await this.repositorioTransacao.save(transacao);
 

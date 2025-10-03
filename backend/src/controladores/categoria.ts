@@ -2,6 +2,7 @@ import { Response } from "express";
 import { Repository } from "typeorm";
 import { AppDataSource } from "../database/db";
 import { Categoria } from "../modelos/categoria";
+import { Transacao } from "../modelos/transacao";
 import { CriarCategoriaDto, RequestAutenticado } from "../tipos";
 import {
   respostaConflito,
@@ -15,10 +16,26 @@ import {
 } from "../utils/respostas";
 
 let repositorioCategoria: Repository<Categoria>;
+let repositorioTransacao: Repository<Transacao>;
+
 const inicializarRepositorio = () => {
   if (!repositorioCategoria) {
     repositorioCategoria = AppDataSource.getRepository(Categoria);
   }
+  if (!repositorioTransacao) {
+    repositorioTransacao = AppDataSource.getRepository(Transacao);
+  }
+};
+
+const buscarCategoriaOutras = async (
+  usuarioId: string
+): Promise<Categoria | null> => {
+  return await repositorioCategoria.findOne({
+    where: {
+      nome: "Outras",
+      usuario: { id: usuarioId },
+    },
+  });
 };
 
 /**
@@ -47,7 +64,6 @@ export const listarCategorias = async (
       respostaDadosInvalidos(res, "Página deve ser maior que 0");
       return;
     }
-    // Monta query
     const queryBuilder = repositorioCategoria
       .createQueryBuilder("categoria")
       .where("categoria.usuarioId = :usuarioId", { usuarioId: req.usuario.id })
@@ -214,6 +230,15 @@ export const atualizarCategoria = async (
       respostaNaoEncontrado(res, "Categoria não encontrada");
       return;
     }
+
+    if (categoria.nome === "Outras") {
+      respostaConflito(
+        res,
+        "Categoria",
+        "A categoria 'Outras' não pode ser editada"
+      );
+      return;
+    }
     if (nome && nome.trim() !== categoria.nome) {
       const categoriaComMesmoNome = await repositorioCategoria.findOne({
         where: {
@@ -273,13 +298,29 @@ export const removerCategoria = async (
       respostaNaoEncontrado(res, "Categoria não encontrada");
       return;
     }
-    if (categoria.transacoes && categoria.transacoes.length > 0) {
-      respostaDadosInvalidos(
+
+    if (categoria.nome === "Outras") {
+      respostaConflito(
         res,
-        "Não é possível remover categoria que possui transações associadas"
+        "Categoria",
+        "A categoria 'Outras' não pode ser excluída"
       );
       return;
     }
+
+    const categoriaOutras = await buscarCategoriaOutras(req.usuario.id);
+    if (!categoriaOutras) {
+      respostaErro(res, "Categoria padrão 'Outras' não encontrada");
+      return;
+    }
+
+    if (categoria.transacoes && categoria.transacoes.length > 0) {
+      await repositorioTransacao.update(
+        { categoria: { id } },
+        { categoria: { id: categoriaOutras.id } }
+      );
+    }
+
     await repositorioCategoria.remove(categoria);
 
     respostaSemConteudo(res);

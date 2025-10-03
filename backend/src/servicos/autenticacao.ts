@@ -2,11 +2,13 @@ import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
 import { Repository } from "typeorm";
 import { AppDataSource } from "../database/db";
+import { Categoria } from "../modelos/categoria";
 import { Usuario } from "../modelos/usuario";
 import { CriarUsuarioDto, LoginDto, TokenPayload } from "../tipos";
 
 class ServicoAutenticacao {
   private repositorioUsuario: Repository<Usuario>;
+  private repositorioCategoria: Repository<Categoria>;
   private chaveSecretaJWT: string;
   private expiracaoToken: string;
   private saltRounds: number;
@@ -14,11 +16,46 @@ class ServicoAutenticacao {
   constructor() {
     // Inicia TypeORM
     this.repositorioUsuario = AppDataSource.getRepository(Usuario);
+    this.repositorioCategoria = AppDataSource.getRepository(Categoria);
     this.chaveSecretaJWT =
       process.env.JWT_SECRET ||
       "8f3e9d2a7b5c1e4f6a9b8c0d3e2f1a4b7c6d9e8f0a1b2c5d4e3f6a7b8c9d0e1f2";
     this.expiracaoToken = process.env.JWT_EXPIRATION || "24h";
     this.saltRounds = 12;
+  }
+
+  /**
+   * @param usuarioId
+   */
+  private async criarCategoriasPadrao(usuarioId: string): Promise<void> {
+    const categoriasPadrao = [
+      {
+        nome: "Mercado",
+        descricao: "Compras de supermercado",
+        usuario: { id: usuarioId },
+      },
+      {
+        nome: "Salário",
+        descricao: "Renda mensal",
+        usuario: { id: usuarioId },
+      },
+      {
+        nome: "Hobbie",
+        descricao: "Gastos com entretenimento e lazer",
+        usuario: { id: usuarioId },
+      },
+      {
+        nome: "Outras",
+        descricao:
+          "Transações diversas que não se encaixam nas outras categorias",
+        usuario: { id: usuarioId },
+      },
+    ];
+
+    for (const categoriaData of categoriasPadrao) {
+      const categoria = this.repositorioCategoria.create(categoriaData);
+      await this.repositorioCategoria.save(categoria);
+    }
   }
 
   /**
@@ -43,6 +80,9 @@ class ServicoAutenticacao {
       senha: senhaHasheada,
     });
     const usuarioSalvo = await this.repositorioUsuario.save(novoUsuario);
+
+    await this.criarCategoriasPadrao(usuarioSalvo.id);
+
     const { senha: _, ...usuarioSemSenha } = usuarioSalvo;
     return usuarioSemSenha;
   }

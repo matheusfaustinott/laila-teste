@@ -30,9 +30,20 @@ const inicializarRepositorios = () => {
   }
 };
 
+const buscarCategoriaOutras = async (
+  usuarioId: string
+): Promise<Categoria | null> => {
+  return await repositorioCategoria.findOne({
+    where: {
+      nome: "Outras",
+      usuario: { id: usuarioId },
+    },
+  });
+};
+
 /**
- * @param req - Request autenticado
- * @param res - Response com lista de transações
+ * @param req
+ * @param res
  */
 export const listarTransacoes = async (
   req: RequestAutenticado,
@@ -191,8 +202,11 @@ export const criarTransacao = async (
       respostaDadosInvalidos(res, errosValidacao);
       return;
     }
+
+    let categoria: Categoria | null = null;
+
     if (categoriaId) {
-      const categoria = await repositorioCategoria.findOne({
+      categoria = await repositorioCategoria.findOne({
         where: {
           id: categoriaId,
           usuario: { id: req.usuario.id },
@@ -203,15 +217,22 @@ export const criarTransacao = async (
         respostaNaoEncontrado(res, "Categoria não encontrada");
         return;
       }
+    } else {
+      categoria = await buscarCategoriaOutras(req.usuario.id);
+      if (!categoria) {
+        respostaErro(res, "Categoria padrão 'Outras' não encontrada");
+        return;
+      }
     }
+
     const novaTransacao = repositorioTransacao.create({
       titulo: titulo.trim(),
       descricao: descricao?.trim(),
       valor: parseFloat(valor.toString()),
       tipo: tipo.toLowerCase() as "receita" | "despesa",
-      data: new Date(data),
+      data: new Date(data + "T00:00:00"),
       usuario: { id: req.usuario.id },
-      categoria: categoriaId ? { id: categoriaId } : undefined,
+      categoria: { id: categoria.id },
     });
     const transacaoSalva = await repositorioTransacao.save(novaTransacao);
     const transacaoCompleta = await repositorioTransacao.findOne({
@@ -274,8 +295,11 @@ export const atualizarTransacao = async (
       respostaNaoEncontrado(res, "Transação não encontrada");
       return;
     }
+
+    let categoria: Categoria | null = null;
+
     if (categoriaId) {
-      const categoria = await repositorioCategoria.findOne({
+      categoria = await repositorioCategoria.findOne({
         where: {
           id: categoriaId,
           usuario: { id: req.usuario.id },
@@ -286,15 +310,20 @@ export const atualizarTransacao = async (
         respostaNaoEncontrado(res, "Categoria não encontrada");
         return;
       }
+    } else {
+      categoria = await buscarCategoriaOutras(req.usuario.id);
+      if (!categoria) {
+        respostaErro(res, "Categoria padrão 'Outras' não encontrada");
+        return;
+      }
     }
+
     transacao.titulo = titulo.trim();
     transacao.descricao = descricao?.trim();
     transacao.valor = parseFloat(valor.toString());
     transacao.tipo = tipo.toLowerCase() as "receita" | "despesa";
-    transacao.data = new Date(data);
-    transacao.categoria = categoriaId
-      ? ({ id: categoriaId } as Categoria)
-      : undefined;
+    transacao.data = new Date(data + "T00:00:00");
+    transacao.categoria = { id: categoria.id } as Categoria;
     const transacaoAtualizada = await repositorioTransacao.save(transacao);
     const transacaoCompleta = await repositorioTransacao.findOne({
       where: { id: transacaoAtualizada.id },
